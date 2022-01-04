@@ -1,3 +1,4 @@
+-----------------------------------------
 Prog                 :=      Expr
 Expr                 :=      AddExpr
 AddExpr              :=      MultiExpr
@@ -7,3 +8,14 @@ MultiExpr            :=      PrimaryExpr
                      :=      MultiExpr * PrimaryExpr
                      :=      MultiExpr / PrimaryExpr
 PrimaryExpr          :=      Num
+-----------------------------------------
+Prog                 :=      Expr
+Expr                 :=      AddExpr
+AddExpr              :=      MultiExpr
+                     :=      AddExpr + MultiExpr
+                     :=      AddExpr -  MultiExpr
+MultiExpr            :=      PrimaryExpr
+                     :=      MultiExpr * PrimaryExpr
+                     :=      MultiExpr / PrimaryExpr
+PrimaryExpr          :=      Num
+                     :=      (Expr)

@@ -48,6 +48,14 @@ void C100::Lexer::GetNextToken() {
     kind = TokenKind::Div;
     GetNextChar();
   }
+  else if (CurChar == '(') {
+    kind = TokenKind::LParent;
+    GetNextChar();
+  }
+  else if (CurChar == ')') {
+    kind = TokenKind::RParent;
+    GetNextChar();
+  }
   else if (isdigit(CurChar)) {
     kind = TokenKind::Num;
     value = 0;
