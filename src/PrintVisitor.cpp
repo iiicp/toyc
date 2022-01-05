@@ -15,13 +15,12 @@ using namespace C100;
 
 void PrintVisitor::VisitorProgramNode(ProgramNode *node)
 {
-  node->Lhs->Accept(this);
-  //Content += "\n";
+  for (auto &S : node->Stmts)
+    S->Accept(this);
 }
 
 void PrintVisitor::VisitorBinaryNode(BinaryNode *node)
 {
-  node->Rhs->Accept(this);
   node->Lhs->Accept(this);
   switch (node->BinOp) {
   case BinaryOperator::Add:
@@ -40,10 +39,27 @@ void PrintVisitor::VisitorBinaryNode(BinaryNode *node)
     assert(0);
     break;
   }
+  node->Rhs->Accept(this);
 }
 
 void PrintVisitor::VisitorConstantNode(ConstantNode *node)
 {
   //printf(" %d ", node->Value);
   Content += std::to_string(node->Value);
+}
+
+void PrintVisitor::VisitorExprStmtNode(ExprStmtNode *node)
+{
+  node->Lhs->Accept(this);
+  Content += ";";
+}
+
+void PrintVisitor::VisitorVarExprNode(VarExprNode *node) {
+  Content += std::string(node->VarObj->Name);
+}
+
+void PrintVisitor::VisitorAssignExprNode(AssignExprNode *node) {
+  node->Lhs->Accept(this);
+  Content += '=';
+  node->Rhs->Accept(this);
 }

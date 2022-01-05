@@ -12,6 +12,8 @@
 #define C100_ASTNODE_H
 
 #include <memory>
+#include <list>
+#include <string_view>
 
 namespace C100
 {
@@ -23,10 +25,33 @@ namespace C100
     virtual void Accept(AstVisitor *visitor) {};
   };
 
+  class Var
+  {
+  public:
+    std::string_view Name;
+    int Offset;
+  };
+
   class ProgramNode : public AstNode
   {
   public:
+    std::list<std::shared_ptr<AstNode>> Stmts;
+    std::list<std::shared_ptr<Var>> LocalVars;
+    void Accept(AstVisitor *visitor) override;
+  };
+
+  class ExprStmtNode : public AstNode
+  {
+  public:
     std::shared_ptr<AstNode> Lhs;
+    void Accept(AstVisitor *visitor) override;
+  };
+
+  class AssignExprNode : public AstNode
+  {
+  public:
+    std::shared_ptr<AstNode> Lhs;
+    std::shared_ptr<AstNode> Rhs;
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -54,13 +79,23 @@ namespace C100
     void Accept(AstVisitor *visitor) override;
   };
 
+  class VarExprNode : public AstNode
+  {
+  public:
+    std::shared_ptr<Var> VarObj;
+    void Accept(AstVisitor *visitor) override;
+  };
+
   class AstVisitor
   {
   public:
     virtual ~AstVisitor(){}
     virtual void VisitorProgramNode(ProgramNode *node){};
+    virtual void VisitorExprStmtNode(ExprStmtNode *node){};
+    virtual void VisitorAssignExprNode(AssignExprNode *node){};
     virtual void VisitorBinaryNode(BinaryNode *node){};
     virtual void VisitorConstantNode(ConstantNode *node){};
+    virtual void VisitorVarExprNode(VarExprNode *node){};
   };
 }
 

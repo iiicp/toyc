@@ -15,13 +15,17 @@ using namespace C100;
 std::shared_ptr<ProgramNode> Parser::Parse()
 {
   auto node = std::make_shared<ProgramNode>();
-  node->Lhs = ParseExpr();
+  Locals = &node->LocalVars;
+  while (Lex.CurrentToken->Kind != TokenKind::Eof) {
+    node->Stmts.push_back(ParseStmt());
+  }
+
   return node;
 }
 
 std::shared_ptr<AstNode> Parser::ParseExpr()
 {
-  return ParseAddExpr();
+  return ParseAssignExpr();
 }
 
 std::shared_ptr<AstNode> Parser::ParseAddExpr()
@@ -67,11 +71,63 @@ std::shared_ptr<AstNode> Parser::ParsePrimaryExpr()
         auto node = ParseExpr();
         Lex.GetNextToken();
         return node;
-    }else {
+    }else if (Lex.CurrentToken->Kind == TokenKind::Num) {
         auto node = std::make_shared<ConstantNode>();
         node->Value = Lex.CurrentToken->Value;
         Lex.GetNextToken();
         return node;
+    }else if (Lex.CurrentToken->Kind == TokenKind::Identifier) {
+        auto node = std::make_shared<VarExprNode>();
+
+        std::shared_ptr<Var> obj = FindLocalVar(Lex.CurrentToken->Content);
+        if (!obj) {
+          obj = MakeLocalVar(Lex.CurrentToken->Content);
+        }
+        node->VarObj = obj;
+        Lex.GetNextToken();
+        return node;
+    }else {
+      printf("not support!!!!");
+      assert(0);
     }
+}
+
+std::shared_ptr<AstNode> Parser::ParseStmt()
+{
+  auto node = std::make_shared<ExprStmtNode>();
+  node->Lhs = ParseExpr();
+  assert(Lex.CurrentToken->Kind == TokenKind::Semicolon);
+  Lex.GetNextToken();
+  return node;
+}
+
+std::shared_ptr<AstNode> Parser::ParseAssignExpr()
+{
+  auto left = ParseAddExpr();
+
+  if (Lex.CurrentToken->Kind == TokenKind::Assign) {
+    Lex.GetNextToken();
+    auto node = std::make_shared<AssignExprNode>();
+    node->Lhs = left;
+    node->Rhs = ParseAssignExpr();
+    return node;
+  }
+  return left;
+}
+
+std::shared_ptr<Var> Parser::FindLocalVar(std::string_view name) {
+  if (LocalsMap.find(name) != LocalsMap.end()) {
+    return LocalsMap[name];
+  }
+  return nullptr;
+}
+
+std::shared_ptr<Var> Parser::MakeLocalVar(std::string_view name) {
+  auto obj = std::make_shared<Var>();
+  obj->Name = name;
+  obj->Offset = 0;
+  Locals->push_front(obj);
+  LocalsMap[name] = obj;
+  return obj;
 }
 

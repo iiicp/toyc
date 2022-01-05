@@ -24,6 +24,9 @@ namespace C100
       Num,
       LParent,
       RParent,
+      Identifier,
+      Semicolon,
+      Assign,
       Eof
   };
 
@@ -49,6 +52,11 @@ namespace C100
     }
     void GetNextToken();
     void GetNextChar();
+
+  private:
+    bool IsLetter();
+    bool IsDigit();
+    bool IsLetterOrDigit();
   };
 }
 

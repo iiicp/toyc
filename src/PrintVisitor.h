@@ -24,8 +24,11 @@ public:
   void VisitorProgramNode(ProgramNode *node) override;
 
 private:
+  void VisitorExprStmtNode(ExprStmtNode *node) override;
+  void VisitorAssignExprNode(AssignExprNode *node) override;
   void VisitorBinaryNode(BinaryNode *node) override;
   void VisitorConstantNode(ConstantNode *node) override;
+  void VisitorVarExprNode(VarExprNode *node) override;
 };
 }
 

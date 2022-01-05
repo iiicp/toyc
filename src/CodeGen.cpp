@@ -25,12 +25,21 @@ void CodeGen::VisitorProgramNode(ProgramNode *node)
     printf("_prog:\n");
 #endif
 
+    int stackSize = 0;
+    for (auto &V : node->LocalVars)
+    {
+      stackSize += 8;
+      V->Offset = stackSize * -1;
+    }
+
     printf("\tpush %%rbp\n");
     printf("\tmov %%rsp, %%rbp\n");
-    printf("\tsub $32, %%rsp\n");
+    printf("\tsub $%d, %%rsp\n", stackSize);
 
-    node->Lhs->Accept(this);
-    assert(StackLevel == 0);
+    for (auto &S : node->Stmts) {
+      S->Accept(this);
+      assert(StackLevel == 0);
+    }
 
     printf("\tmov %%rbp, %%rsp\n");
     printf("\tpop %%rbp\n");
@@ -79,5 +88,25 @@ void CodeGen::Pop(const char *reg)
 {
   printf("\tpop %s\n", reg);
   StackLevel--;
+}
+
+void CodeGen::VisitorExprStmtNode(ExprStmtNode *node) {
+  node->Lhs->Accept(this);
+}
+
+void CodeGen::VisitorAssignExprNode(AssignExprNode *node) {
+
+  auto varNode = std::dynamic_pointer_cast<VarExprNode>(node->Lhs);
+  assert(varNode != nullptr);
+  printf("\tlea %d(%%rbp), %%rax\n", varNode->VarObj->Offset);
+  Push();
+  node->Rhs->Accept(this);
+  Pop("%rdi");
+  printf("\tmov %%rax, (%%rdi)\n");
+}
+
+void CodeGen::VisitorVarExprNode(VarExprNode *node) {
+  printf("\tlea %d(%%rbp), %%rax\n", node->VarObj->Offset);
+  printf("\tmov (%%rax), %%rax\n");
 }
 

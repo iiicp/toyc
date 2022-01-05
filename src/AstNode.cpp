@@ -27,3 +27,17 @@ void ConstantNode::Accept(AstVisitor *visitor)
 {
   visitor->VisitorConstantNode(this);
 }
+
+void ExprStmtNode::Accept(AstVisitor *visitor)
+{
+  visitor->VisitorExprStmtNode(this);
+}
+
+void VarExprNode::Accept(AstVisitor *visitor)
+{
+  visitor->VisitorVarExprNode(this);
+}
+
+void AssignExprNode::Accept(AstVisitor *visitor) {
+  visitor->VisitorAssignExprNode(this);
+}
