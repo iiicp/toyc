@@ -10,6 +10,8 @@
 
 #include "Lexer.h"
 #include <cstring>
+#include "Diag.h"
+#include <string>
 
 using namespace C100;
 
@@ -24,10 +26,18 @@ void Lexer::GetNextChar() {
 
 void Lexer::GetNextToken() {
   /// 1. skip write space
-  while (isspace(CurChar))
+  while (isspace(CurChar)) {
+    if (CurChar == '\n') {
+      Line++;
+      LineHead = Cursor;
+    }
     GetNextChar();
+  }
 
   TokenKind kind;
+  SourceLocation Location;
+  Location.Line = Line;
+  Location.Col = Cursor-1-LineHead;
   int value = 0;
   int startPos = Cursor - 1;
   if (CurChar == '\0')
@@ -80,13 +90,13 @@ void Lexer::GetNextToken() {
       }
       kind = TokenKind::Identifier;
     }else {
-      printf("not support %c\n", CurChar);
-      assert(0);
+      DiagE(SourceCode, Location, "current '%c' is illegal", CurChar);
     }
   }
   CurrentToken = std::make_shared<Token>();
   CurrentToken->Kind = kind;
   CurrentToken->Value = value;
+  CurrentToken->Location = Location;
   CurrentToken->Content = SourceCode.substr(startPos, Cursor-1-startPos);
 }
 
@@ -103,4 +113,30 @@ bool Lexer::IsDigit()
 bool Lexer::IsLetterOrDigit()
 {
   return IsLetter() || IsDigit();
+}
+
+void Lexer::ExpectToken(TokenKind kind)
+{
+  if (CurrentToken->Kind == kind) {
+    GetNextToken();
+  }else {
+    DiagE(SourceCode, CurrentToken->Location, "'%s' expected", GetTokenSimpleSpelling(kind));
+  }
+}
+
+const char  *Lexer::GetTokenSimpleSpelling(TokenKind kind){
+  switch (kind) {
+  case TokenKind::Add: return "+";
+  case TokenKind::Sub: return "-";
+  case TokenKind::Mul: return "*";
+  case TokenKind::Div: return "/";
+  case TokenKind::LParent: return "(";
+  case TokenKind::RParent: return ")";
+  case TokenKind::Semicolon: return ";";
+  case TokenKind::Assign: return "=";
+  case TokenKind::Eof: return "eof";
+  default:
+    break;
+  }
+  return 0;
 }

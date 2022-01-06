@@ -30,33 +30,44 @@ namespace C100
       Eof
   };
 
+  struct SourceLocation
+  {
+    int Line;
+    int Col;
+  };
+
   class Token
   {
   public:
     TokenKind Kind;
     int Value;
+    SourceLocation Location;
     std::string_view Content;
   };
 
   class Lexer
   {
   private:
-    std::string_view SourceCode;
     char CurChar{' '};
     int Cursor{0};
+    int Line{0};
+    int LineHead{0};
   public:
     std::shared_ptr<Token> CurrentToken;
+    std::string_view SourceCode;
   public:
     Lexer(const char *code){
       SourceCode = code;
     }
     void GetNextToken();
     void GetNextChar();
-
+    void ExpectToken(TokenKind kind);
   private:
     bool IsLetter();
     bool IsDigit();
     bool IsLetterOrDigit();
+
+    const char *GetTokenSimpleSpelling(TokenKind kind);
   };
 }
 

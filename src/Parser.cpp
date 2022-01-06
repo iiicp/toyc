@@ -9,6 +9,8 @@
  ***********************************/
 
 #include "Parser.h"
+#include "Diag.h"
+#include <string>
 
 using namespace C100;
 
@@ -69,7 +71,7 @@ std::shared_ptr<AstNode> Parser::ParsePrimaryExpr()
     if (Lex.CurrentToken->Kind == TokenKind::LParent) {
         Lex.GetNextToken();
         auto node = ParseExpr();
-        Lex.GetNextToken();
+        Lex.ExpectToken(TokenKind::RParent);
         return node;
     }else if (Lex.CurrentToken->Kind == TokenKind::Num) {
         auto node = std::make_shared<ConstantNode>();
@@ -87,17 +89,17 @@ std::shared_ptr<AstNode> Parser::ParsePrimaryExpr()
         Lex.GetNextToken();
         return node;
     }else {
-      printf("not support!!!!");
-      assert(0);
+      DiagE(Lex.SourceCode, Lex.CurrentToken->Location,
+            "not support");
     }
+  return nullptr;
 }
 
 std::shared_ptr<AstNode> Parser::ParseStmt()
 {
   auto node = std::make_shared<ExprStmtNode>();
   node->Lhs = ParseExpr();
-  assert(Lex.CurrentToken->Kind == TokenKind::Semicolon);
-  Lex.GetNextToken();
+  Lex.ExpectToken(TokenKind::Semicolon);
   return node;
 }
 
