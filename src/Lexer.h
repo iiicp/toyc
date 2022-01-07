@@ -27,6 +27,12 @@ namespace C100
       Identifier,
       Semicolon,
       Assign,
+      Equal,
+      PipeEqual,
+      Greater,
+      GreaterEqual,
+      Lesser,
+      LesserEqual,
       Eof
   };
 
@@ -66,6 +72,8 @@ namespace C100
     bool IsLetter();
     bool IsDigit();
     bool IsLetterOrDigit();
+
+    char PeekChar(int distance);
 
     const char *GetTokenSimpleSpelling(TokenKind kind);
   };

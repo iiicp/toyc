@@ -73,7 +73,39 @@ void Lexer::GetNextToken() {
     GetNextChar();
   }
   else if (CurChar == '=') {
-    kind = TokenKind::Assign;
+    if (PeekChar(1) == '=') {
+      GetNextChar();
+      kind = TokenKind::Equal;
+    }else {
+      kind = TokenKind::Assign;
+    }
+    GetNextChar();
+  }
+  else if (CurChar == '!') {
+    if (PeekChar(1) == '=') {
+      GetNextChar();
+      kind = TokenKind::PipeEqual;
+    }else {
+      DiagE(SourceCode, Location, "current '%c' is illegal", CurChar);
+    }
+    GetNextChar();
+  }
+  else if (CurChar == '>') {
+    if (PeekChar(1) == '=') {
+      GetNextChar();
+      kind = TokenKind::GreaterEqual;
+    }else {
+      kind = TokenKind::Greater;
+    }
+    GetNextChar();
+  }
+  else if (CurChar == '<') {
+    if (PeekChar(1) == '=') {
+      GetNextChar();
+      kind = TokenKind::LesserEqual;
+    }else {
+      kind = TokenKind::Lesser;
+    }
     GetNextChar();
   }
   else if (isdigit(CurChar)) {
@@ -139,4 +171,14 @@ const char  *Lexer::GetTokenSimpleSpelling(TokenKind kind){
     break;
   }
   return 0;
+}
+
+char Lexer::PeekChar(int distance)
+{
+    assert(distance>=0);
+    if (Cursor - 1 + distance < SourceCode.size()) {
+      return SourceCode[Cursor-1+distance];
+    }else {
+      return '\0';
+    }
 }

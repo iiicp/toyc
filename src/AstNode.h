@@ -60,7 +60,13 @@ namespace C100
     Add,
     Sub,
     Mul,
-    Div
+    Div,
+    Equal,
+    PipeEqual,
+    Greater,
+    GreaterEqual,
+    Lesser,
+    LesserEqual
   };
 
   class BinaryNode : public AstNode

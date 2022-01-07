@@ -35,3 +35,27 @@ MultiExpr            :=      PrimaryExpr
 PrimaryExpr          :=      Num
                      :=      (Expr)
                      :=      Identifier
+
+-----------------------------------------
+Prog                 :=      Stmt*
+Stmt                 :=      Expr;
+Expr                 :=      AssignExpr
+AssignExpr           :=      EqualityExpr
+                     :=      EqualityExpr = AssignExpr
+EqualityExpr         :=      RelationalExpr
+                     :=      EqualityExpr == RelationalExpr
+                     :=      EqualityExpr != relationalExpr
+RelationalExpr       :=      AddExpr
+                     :=      RelationalExpr < AddExpr
+                     :=      RelationalExpr > AddExpr
+                     :=      RelationalExpr <= AddExpr
+                     :=      RelationalExpr >= AddExpr
+AddExpr              :=      MultiExpr
+                     :=      AddExpr + MultiExpr
+                     :=      AddExpr -  MultiExpr
+MultiExpr            :=      PrimaryExpr
+                     :=      MultiExpr * PrimaryExpr
+                     :=      MultiExpr / PrimaryExpr
+PrimaryExpr          :=      Num
+                     :=      (Expr)
+                     :=      Identifier

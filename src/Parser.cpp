@@ -103,9 +103,51 @@ std::shared_ptr<AstNode> Parser::ParseStmt()
   return node;
 }
 
+
+std::shared_ptr<AstNode> Parser::ParseEqualExpr() {
+  auto left = ParseRelationalExpr();
+  while (Lex.CurrentToken->Kind == TokenKind::Equal ||
+  Lex.CurrentToken->Kind == TokenKind::PipeEqual ) {
+    BinaryOperator op = BinaryOperator::Equal;
+    if (Lex.CurrentToken->Kind == TokenKind::PipeEqual)
+      op = BinaryOperator::PipeEqual;
+    Lex.GetNextToken();
+    auto node = std::make_shared<BinaryNode>();
+    node->BinOp = op;
+    node->Lhs = left;
+    node->Rhs = ParseRelationalExpr();
+    left = node;
+  }
+  return left;
+}
+
+std::shared_ptr<AstNode> Parser::ParseRelationalExpr() {
+  auto left = ParseAddExpr();
+  while (Lex.CurrentToken->Kind == TokenKind::Greater ||
+      Lex.CurrentToken->Kind == TokenKind::GreaterEqual ||
+      Lex.CurrentToken->Kind == TokenKind::Lesser ||
+      Lex.CurrentToken->Kind == TokenKind::LesserEqual) {
+    BinaryOperator op = BinaryOperator::Greater;
+    if (Lex.CurrentToken->Kind == TokenKind::GreaterEqual)
+      op = BinaryOperator::GreaterEqual;
+    else if (Lex.CurrentToken->Kind == TokenKind::Lesser)
+      op = BinaryOperator::Lesser;
+    else if (Lex.CurrentToken->Kind == TokenKind::LesserEqual)
+      op = BinaryOperator::LesserEqual;
+
+    Lex.GetNextToken();
+    auto node = std::make_shared<BinaryNode>();
+    node->BinOp = op;
+    node->Lhs = left;
+    node->Rhs = ParseAddExpr();
+    left = node;
+  }
+  return left;
+}
+
 std::shared_ptr<AstNode> Parser::ParseAssignExpr()
 {
-  auto left = ParseAddExpr();
+  auto left = ParseEqualExpr();
 
   if (Lex.CurrentToken->Kind == TokenKind::Assign) {
     Lex.GetNextToken();

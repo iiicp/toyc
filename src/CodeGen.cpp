@@ -67,6 +67,48 @@ void CodeGen::VisitorBinaryNode(BinaryNode *node)
     printf("\tcqo\n");
     printf("\tidiv %%rdi\n");
     break;
+  case BinaryOperator::Equal:
+  {
+    printf("\tcmp %%rdi, %%rax\n");
+    printf("\tsete %%al\n");
+    printf("\tmovzb %%al, %%rax\n");
+  }
+    break;
+  case BinaryOperator::PipeEqual:
+  {
+    printf("\tcmp %%rdi, %%rax\n");
+    printf("\tsetne %%al\n");
+    printf("\tmovzb %%al, %%rax\n");
+  }
+    break;
+  case BinaryOperator::Greater:
+  {
+    printf("\tcmp %%rdi, %%rax\n");
+    printf("\tsetg %%al\n");
+    printf("\tmovzb %%al, %%rax\n");
+  }
+    break;
+  case BinaryOperator::GreaterEqual:
+  {
+    printf("\tcmp %%rdi, %%rax\n");
+    printf("\tsetge %%al\n");
+    printf("\tmovzb %%al, %%rax\n");
+  }
+    break;
+  case BinaryOperator::Lesser:
+  {
+    printf("\tcmp %%rdi, %%rax\n");
+    printf("\tsetl %%al\n");
+    printf("\tmovzb %%al, %%rax\n");
+  }
+    break;
+  case BinaryOperator::LesserEqual:
+  {
+    printf("\tcmp %%rdi, %%rax\n");
+    printf("\tsetle %%al\n");
+    printf("\tmovzb %%al, %%rax\n");
+  }
+    break;
   default:
     assert(0);
     break;
