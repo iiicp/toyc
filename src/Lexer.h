@@ -24,6 +24,8 @@ namespace C100
       Num,
       LParent,
       RParent,
+      LBrace,
+      RBrace,
       Identifier,
       Semicolon,
       Assign,
@@ -33,6 +35,8 @@ namespace C100
       GreaterEqual,
       Lesser,
       LesserEqual,
+      If,
+      Else,
       Eof
   };
 

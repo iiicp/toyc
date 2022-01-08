@@ -18,6 +18,7 @@ namespace C100 {
   {
   private:
     int StackLevel{0};
+    int Sequence{0};
   public:
     CodeGen() {}
     void VisitorProgramNode(ProgramNode *node) override;
@@ -25,6 +26,8 @@ namespace C100 {
   private:
     void VisitorExprStmtNode(ExprStmtNode *node)override;
     void VisitorAssignExprNode(AssignExprNode *node)override;
+    void VisitorIfStmtNode(IfStmtNode *node) override;
+    void VisitorBlockStmtNode(BlockStmtNode *node) override;
     void VisitorBinaryNode(BinaryNode *node) override;
     void VisitorConstantNode(ConstantNode *node) override;
     void VisitorVarExprNode(VarExprNode *node)override;

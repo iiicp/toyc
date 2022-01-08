@@ -78,6 +78,25 @@ void PrintVisitor::VisitorVarExprNode(VarExprNode *node) {
 
 void PrintVisitor::VisitorAssignExprNode(AssignExprNode *node) {
   node->Lhs->Accept(this);
-  Content += '=';
+  Content += "=";
   node->Rhs->Accept(this);
+}
+
+void PrintVisitor::VisitorIfStmtNode(IfStmtNode *node) {
+  Content += "if";
+  Content += "(";
+  node->Cond->Accept(this);
+  Content += ")";
+  node->Then->Accept(this);
+  if (node->Else) {
+    Content += "else ";
+    node->Else->Accept(this);
+  }
+}
+
+void PrintVisitor::VisitorBlockStmtNode(BlockStmtNode *node) {
+  Content += "{";
+  for (auto &s : node->Stmts)
+    s->Accept(this);
+  Content += "}";
 }

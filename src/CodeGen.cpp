@@ -152,3 +152,31 @@ void CodeGen::VisitorVarExprNode(VarExprNode *node) {
   printf("\tmov (%%rax), %%rax\n");
 }
 
+void CodeGen::VisitorIfStmtNode(IfStmtNode *node) {
+    /// 1. 判断条件
+    int n = Sequence++;
+    node->Cond->Accept(this);
+    printf("\tcmp $0, %%rax\n");
+    if (node->Else) {
+      printf("\tje .L.else_%d\n",n);
+    }else {
+      printf("\tje .L.end_%d\n", n);
+    }
+
+    node->Then->Accept(this);
+    printf("\tje .L.end_%d\n", n);
+
+    if (node->Else) {
+      printf(".L.else_%d:\n", n);
+      node->Else->Accept(this);
+    }
+
+    printf(".L.end_%d:\n", n);
+}
+
+void CodeGen::VisitorBlockStmtNode(BlockStmtNode *node)
+{
+  for (auto &s : node->Stmts)
+    s->Accept(this);
+}
+

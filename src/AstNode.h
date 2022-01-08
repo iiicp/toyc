@@ -47,6 +47,23 @@ namespace C100
     void Accept(AstVisitor *visitor) override;
   };
 
+  class IfStmtNode : public AstNode
+  {
+  public:
+    std::shared_ptr<AstNode> Cond{nullptr};
+    std::shared_ptr<AstNode> Then{nullptr};
+    std::shared_ptr<AstNode> Else{nullptr};
+
+    void Accept(AstVisitor *visitor) override;
+  };
+
+  class BlockStmtNode : public AstNode
+  {
+  public:
+    std::list<std::shared_ptr<AstNode>> Stmts;
+    void Accept(AstVisitor *visitor) override;
+  };
+
   class AssignExprNode : public AstNode
   {
   public:
@@ -98,6 +115,8 @@ namespace C100
     virtual ~AstVisitor(){}
     virtual void VisitorProgramNode(ProgramNode *node){};
     virtual void VisitorExprStmtNode(ExprStmtNode *node){};
+    virtual void VisitorIfStmtNode(IfStmtNode *node){};
+    virtual void VisitorBlockStmtNode(BlockStmtNode *node) {}
     virtual void VisitorAssignExprNode(AssignExprNode *node){};
     virtual void VisitorBinaryNode(BinaryNode *node){};
     virtual void VisitorConstantNode(ConstantNode *node){};

@@ -97,10 +97,34 @@ std::shared_ptr<AstNode> Parser::ParsePrimaryExpr()
 
 std::shared_ptr<AstNode> Parser::ParseStmt()
 {
-  auto node = std::make_shared<ExprStmtNode>();
-  node->Lhs = ParseExpr();
-  Lex.ExpectToken(TokenKind::Semicolon);
-  return node;
+  if (Lex.CurrentToken->Kind == TokenKind::If) {
+    auto node = std::make_shared<IfStmtNode>();
+    Lex.GetNextToken();
+    Lex.ExpectToken(TokenKind::LParent);
+    node->Cond = ParseExpr();
+    Lex.ExpectToken(TokenKind::RParent);
+    node->Then = ParseStmt();
+    if (Lex.CurrentToken->Kind == TokenKind::Else) {
+      Lex.GetNextToken();
+      node->Else = ParseStmt();
+    }
+    return node;
+  }
+  else if (Lex.CurrentToken->Kind == TokenKind::LBrace) {
+    auto node = std::make_shared<BlockStmtNode>();
+    Lex.GetNextToken();
+    while (Lex.CurrentToken->Kind != TokenKind::RBrace) {
+      node->Stmts.push_back(ParseStmt());
+    }
+    Lex.ExpectToken(TokenKind::RBrace);
+    return node;
+  }
+  else {
+    auto node = std::make_shared<ExprStmtNode>();
+    node->Lhs = ParseExpr();
+    Lex.ExpectToken(TokenKind::Semicolon);
+    return node;
+  }
 }
 
 

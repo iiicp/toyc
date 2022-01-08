@@ -38,6 +38,17 @@ void VarExprNode::Accept(AstVisitor *visitor)
   visitor->VisitorVarExprNode(this);
 }
 
-void AssignExprNode::Accept(AstVisitor *visitor) {
+void AssignExprNode::Accept(AstVisitor *visitor)
+{
   visitor->VisitorAssignExprNode(this);
+}
+
+void IfStmtNode::Accept(AstVisitor *visitor)
+{
+  visitor->VisitorIfStmtNode(this);
+}
+
+void BlockStmtNode::Accept(AstVisitor *visitor)
+{
+  visitor->VisitorBlockStmtNode(this);
 }

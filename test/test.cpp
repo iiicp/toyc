@@ -2,6 +2,8 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "PrintVisitor.h"
+#include <vector>
+#include <string>
 
 using namespace C100;
 TEST_CASE("C100_lexer1", "[lexer]") {
@@ -101,6 +103,37 @@ TEST_CASE("C100_lexer2", "[lexer]") {
   REQUIRE(TokenKind::Eof == lex.CurrentToken->Kind);
 }
 
+TEST_CASE("C100_lexer3", "[lexer]") {
+  const char *code = "a=3; if (a != 3) a = 3; else a = a * a;";
+  Lexer lex(code);
+
+  std::vector<std::string> res = {
+    "a","=","3",";","if","(","a","!=","3",")","a","=","3",";","else","a","=","a","*","a",";","\0"
+  };
+
+  int i = 0;
+  do {
+    lex.GetNextToken();
+    REQUIRE(res[i++] == lex.CurrentToken->Content);
+  }while (lex.CurrentToken->Kind != TokenKind::Eof);
+}
+
+TEST_CASE("C100_lexer4", "[lexer]") {
+  const char *code = "a=3; if (a != 3) {a = 3;} else a = a * a;";
+  Lexer lex(code);
+
+  std::vector<std::string> res = {
+      "a","=","3",";","if","(","a","!=","3",")","{","a","=","3",";","}","else","a","=","a","*","a",";","\0"
+  };
+
+  int i = 0;
+  do {
+    lex.GetNextToken();
+    REQUIRE(res[i++] == lex.CurrentToken->Content);
+  }while (lex.CurrentToken->Kind != TokenKind::Eof);
+}
+
+
 TEST_CASE("C100_parser1", "[parser]")
 {
     const char *code = "5 + (1-  3)*4/2;a+2;";
@@ -141,4 +174,32 @@ TEST_CASE("C100_parser3", "[parser]")
   root->Accept(&visitor);
 
   REQUIRE("a==3;a!=3;a>3;a>=3;a<3;a<=3;" == visitor.Content);
+}
+
+TEST_CASE("C100_parser4", "[parser]")
+{
+  const char *code = "a=3;if (a != 3) a = 3; else a = a * a;";
+  Lexer lexer(code);
+  lexer.GetNextToken();
+  Parser parser(lexer);
+  auto root = parser.Parse();
+
+  PrintVisitor visitor;
+  root->Accept(&visitor);
+
+  REQUIRE("a=3;if(a!=3)a=3;else a=a*a;" == visitor.Content);
+}
+
+TEST_CASE("C100_parser5", "[parser]")
+{
+  const char *code = "a=3;if (a != 3) {a = 3;} else a = a * a;";
+  Lexer lexer(code);
+  lexer.GetNextToken();
+  Parser parser(lexer);
+  auto root = parser.Parse();
+
+  PrintVisitor visitor;
+  root->Accept(&visitor);
+
+  REQUIRE("a=3;if(a!=3){a=3;}else a=a*a;" == visitor.Content);
 }

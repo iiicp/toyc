@@ -68,6 +68,14 @@ void Lexer::GetNextToken() {
     kind = TokenKind::RParent;
     GetNextChar();
   }
+  else if (CurChar == '{') {
+    kind = TokenKind::LBrace;
+    GetNextChar();
+  }
+  else if (CurChar == '}') {
+    kind = TokenKind::RBrace;
+    GetNextChar();
+  }
   else if (CurChar == ';') {
     kind = TokenKind::Semicolon;
     GetNextChar();
@@ -121,6 +129,12 @@ void Lexer::GetNextToken() {
         GetNextChar();
       }
       kind = TokenKind::Identifier;
+      std::string_view content = SourceCode.substr(startPos, Cursor-1-startPos);
+      if (content == "if") {
+        kind = TokenKind::If;
+      }else if (content == "else") {
+        kind = TokenKind::Else;
+      }
     }else {
       DiagE(SourceCode, Location, "current '%c' is illegal", CurChar);
     }
