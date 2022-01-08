@@ -18,4 +18,4 @@ day5: 编译 a=3;a==3;a!=3;a>3;a>=3;a<3;a<=3;
 day6: 能编译如下if语句 
 a=3; if (a!=4) a = 5;     
 a=3; if (a!=4) a = 5; else a = 6;     
-a=3; if (a!=4) {a = 5;a = a + a;} else {a = a*a; a = a + 10;};   
+a=3; if (a!=4) {a = 5;a = a + a;} else {a = a*a; a = a + 10;}
