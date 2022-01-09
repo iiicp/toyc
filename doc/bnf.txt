@@ -38,9 +38,10 @@ PrimaryExpr          :=      Num
 
 -----------------------------------------
 Prog                 :=      Stmt*
-Stmt                 :=      Expr;
+Stmt                 :=      Expr?;
                      :=      if "(" Expr ")" Stmt
                      :=      if "(" Expr ")" Stmt Else Stmt
+                     :=      while "(" Expr ")" Stmt
                      :=      "{" Stmt* "}"
 Expr                 :=      AssignExpr
 AssignExpr           :=      EqualityExpr

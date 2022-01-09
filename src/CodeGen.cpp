@@ -133,7 +133,8 @@ void CodeGen::Pop(const char *reg)
 }
 
 void CodeGen::VisitorExprStmtNode(ExprStmtNode *node) {
-  node->Lhs->Accept(this);
+  if (node->Lhs)
+    node->Lhs->Accept(this);
 }
 
 void CodeGen::VisitorAssignExprNode(AssignExprNode *node) {
@@ -164,11 +165,12 @@ void CodeGen::VisitorIfStmtNode(IfStmtNode *node) {
     }
 
     node->Then->Accept(this);
-    printf("\tje .L.end_%d\n", n);
+    printf("\tjmp .L.end_%d\n", n);
 
     if (node->Else) {
       printf(".L.else_%d:\n", n);
       node->Else->Accept(this);
+      printf("\tjmp .L.end_%d\n", n);
     }
 
     printf(".L.end_%d:\n", n);
@@ -178,5 +180,17 @@ void CodeGen::VisitorBlockStmtNode(BlockStmtNode *node)
 {
   for (auto &s : node->Stmts)
     s->Accept(this);
+}
+
+void CodeGen::VisitorWhileStmtNode(WhileStmtNode *node)
+{
+  int n = Sequence++;
+  printf(".L.begin_%d:\n", n);
+  node->Cond->Accept(this);
+  printf("\tcmp $0, %%rax\n");
+  printf("\tje .L.end_%d\n", n);
+  node->Then->Accept(this);
+  printf("\tjmp .L.begin_%d\n", n);
+  printf(".L.end_%d:\n", n);
 }
 

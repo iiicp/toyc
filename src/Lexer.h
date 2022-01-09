@@ -37,6 +37,7 @@ namespace C100
       LesserEqual,
       If,
       Else,
+      While,
       Eof
   };
 

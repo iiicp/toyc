@@ -68,7 +68,8 @@ void PrintVisitor::VisitorConstantNode(ConstantNode *node)
 
 void PrintVisitor::VisitorExprStmtNode(ExprStmtNode *node)
 {
-  node->Lhs->Accept(this);
+  if (node->Lhs)
+    node->Lhs->Accept(this);
   Content += ";";
 }
 
@@ -99,4 +100,12 @@ void PrintVisitor::VisitorBlockStmtNode(BlockStmtNode *node) {
   for (auto &s : node->Stmts)
     s->Accept(this);
   Content += "}";
+}
+
+void PrintVisitor::VisitorWhileStmtNode(WhileStmtNode *node) {
+  Content += "while";
+  Content += "(";
+  node->Cond->Accept(this);
+  Content += ")";
+  node->Then->Accept(this);
 }

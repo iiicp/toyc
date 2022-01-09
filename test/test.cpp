@@ -133,6 +133,24 @@ TEST_CASE("C100_lexer4", "[lexer]") {
   }while (lex.CurrentToken->Kind != TokenKind::Eof);
 }
 
+TEST_CASE("C100_lexer5", "[lexer]") {
+  const char *code = "a=0; b=1; while (a < 10) {a = a+1; b=a+b;} b;";
+  Lexer lex(code);
+
+  std::vector<std::string> res = {
+      "a","=","0",";","b","=","1",";",
+      "while","(","a","<","10",")",
+      "{","a","=","a","+","1",";","b","=","a","+","b",";","}",
+      "b",";","\0"
+  };
+
+  int i = 0;
+  do {
+    lex.GetNextToken();
+    REQUIRE(res[i++] == lex.CurrentToken->Content);
+  }while (lex.CurrentToken->Kind != TokenKind::Eof);
+}
+
 
 TEST_CASE("C100_parser1", "[parser]")
 {
@@ -202,4 +220,18 @@ TEST_CASE("C100_parser5", "[parser]")
   root->Accept(&visitor);
 
   REQUIRE("a=3;if(a!=3){a=3;}else a=a*a;" == visitor.Content);
+}
+
+TEST_CASE("C100_parser6", "[parser]")
+{
+  const char *code = "a=0; b=1; while (a < 10) {a = a+1; b=a+b;} b;";
+  Lexer lexer(code);
+  lexer.GetNextToken();
+  Parser parser(lexer);
+  auto root = parser.Parse();
+
+  PrintVisitor visitor;
+  root->Accept(&visitor);
+
+  REQUIRE("a=0;b=1;while(a<10){a=a+1;b=a+b;}b;" == visitor.Content);
 }

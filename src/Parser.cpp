@@ -110,6 +110,15 @@ std::shared_ptr<AstNode> Parser::ParseStmt()
     }
     return node;
   }
+  else if (Lex.CurrentToken->Kind == TokenKind::While) {
+    auto node = std::make_shared<WhileStmtNode>();
+    Lex.GetNextToken();
+    Lex.ExpectToken(TokenKind::LParent);
+    node->Cond = ParseExpr();
+    Lex.ExpectToken(TokenKind::RParent);
+    node->Then = ParseStmt();
+    return node;
+  }
   else if (Lex.CurrentToken->Kind == TokenKind::LBrace) {
     auto node = std::make_shared<BlockStmtNode>();
     Lex.GetNextToken();
@@ -121,7 +130,9 @@ std::shared_ptr<AstNode> Parser::ParseStmt()
   }
   else {
     auto node = std::make_shared<ExprStmtNode>();
-    node->Lhs = ParseExpr();
+    if (Lex.CurrentToken->Kind != TokenKind::Semicolon) {
+      node->Lhs = ParseExpr();
+    }
     Lex.ExpectToken(TokenKind::Semicolon);
     return node;
   }
