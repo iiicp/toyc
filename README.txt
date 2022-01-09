@@ -19,3 +19,4 @@ day6: 能编译如下if语句
 a=3; if (a!=4) a = 5;     
 a=3; if (a!=4) a = 5; else a = 6;     
 a=3; if (a!=4) {a = 5;a = a + a;} else {a = a*a; a = a + 10;}
+day7: 编译 a=0; b=1; while (a < 10) {a = a+1; b=a+b;} b;
