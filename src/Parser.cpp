@@ -119,6 +119,33 @@ std::shared_ptr<AstNode> Parser::ParseStmt()
     node->Then = ParseStmt();
     return node;
   }
+  else if (Lex.CurrentToken->Kind == TokenKind::Do) {
+    auto node = std::make_shared<DoWhileStmtNode>();
+    Lex.GetNextToken();
+    node->Stmt = ParseStmt();
+    Lex.ExpectToken(TokenKind::While);
+    Lex.ExpectToken(TokenKind::LParent);
+    node->Cond = ParseExpr();
+    Lex.ExpectToken(TokenKind::RParent);
+    Lex.ExpectToken(TokenKind::Semicolon);
+    return node;
+  }
+  else if (Lex.CurrentToken->Kind == TokenKind::For) {
+    auto node = std::make_shared<ForStmtNode>();
+    Lex.GetNextToken();
+    Lex.ExpectToken(TokenKind::LParent);
+    if (Lex.CurrentToken->Kind != TokenKind::Semicolon)
+      node->Init = ParseExpr();
+    Lex.ExpectToken(TokenKind::Semicolon);
+    if (Lex.CurrentToken->Kind != TokenKind::Semicolon)
+      node->Cond = ParseExpr();
+    Lex.ExpectToken(TokenKind::Semicolon);
+    if (Lex.CurrentToken->Kind != TokenKind::RParent)
+      node->Inc = ParseExpr();
+    Lex.ExpectToken(TokenKind::RParent);
+    node->Stmt = ParseStmt();
+    return node;
+  }
   else if (Lex.CurrentToken->Kind == TokenKind::LBrace) {
     auto node = std::make_shared<BlockStmtNode>();
     Lex.GetNextToken();

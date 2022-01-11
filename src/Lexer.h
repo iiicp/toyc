@@ -38,6 +38,8 @@ namespace C100
       If,
       Else,
       While,
+      Do,
+      For,
       Eof
   };
 

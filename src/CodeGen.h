@@ -28,6 +28,8 @@ namespace C100 {
     void VisitorAssignExprNode(AssignExprNode *node)override;
     void VisitorIfStmtNode(IfStmtNode *node) override;
     void VisitorWhileStmtNode(WhileStmtNode *node) override;
+    void VisitorDoWhileStmtNode(DoWhileStmtNode *node) override;
+    void VisitorForStmtNode(ForStmtNode *node) override;
     void VisitorBlockStmtNode(BlockStmtNode *node) override;
     void VisitorBinaryNode(BinaryNode *node) override;
     void VisitorConstantNode(ConstantNode *node) override;

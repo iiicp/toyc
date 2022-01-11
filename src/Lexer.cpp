@@ -136,6 +136,10 @@ void Lexer::GetNextToken() {
         kind = TokenKind::Else;
       }else if (content == "while") {
         kind = TokenKind::While;
+      }else if (content == "do") {
+        kind = TokenKind::Do;
+      }else if (content == "for") {
+        kind = TokenKind::For;
       }
     }else {
       DiagE(SourceCode, Location, "current '%c' is illegal", CurChar);

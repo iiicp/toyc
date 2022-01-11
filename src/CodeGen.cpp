@@ -194,3 +194,34 @@ void CodeGen::VisitorWhileStmtNode(WhileStmtNode *node)
   printf(".L.end_%d:\n", n);
 }
 
+void CodeGen::VisitorDoWhileStmtNode(DoWhileStmtNode *node)
+{
+  int n = Sequence++;
+  printf(".L.begin_%d:\n", n);
+  node->Stmt->Accept(this);
+  node->Cond->Accept(this);
+  printf("\tcmp $0, %%rax\n");
+  printf("\tje .L.end_%d\n", n);
+  printf("\tjmp .L.begin_%d\n", n);
+  printf(".L.end_%d:\n", n);
+}
+
+void CodeGen::VisitorForStmtNode(ForStmtNode *node)
+{
+  int n = Sequence++;
+  if (node->Init)
+    node->Init->Accept(this);
+  printf(".L.begin_%d:\n", n);
+  if (node->Cond) {
+    node->Cond->Accept(this);
+    printf("\tcmp $0, %%rax\n");
+    printf("\tje .L.end_%d\n", n);
+  }
+  node->Stmt->Accept(this);
+  if (node->Inc) {
+    node->Inc->Accept(this);
+  }
+  printf("\tjmp .L.begin_%d\n", n);
+  printf(".L.end_%d:\n", n);
+}
+

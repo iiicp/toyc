@@ -13,7 +13,17 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  const char *source = argv[1];
+  FILE *fp = fopen(argv[1], "r");
+  if (fp == nullptr) {
+    printf("file open failed: %s\n", argv[1]);
+    return 0;
+  }
+
+  char buf[1024 * 10] = {0};
+  size_t len = fread(buf, 1, sizeof(buf), fp);
+  buf[len] = '\0';
+
+  const char *source = buf;
   Lexer lex(source);
   lex.GetNextToken();
 

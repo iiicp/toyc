@@ -109,3 +109,28 @@ void PrintVisitor::VisitorWhileStmtNode(WhileStmtNode *node) {
   Content += ")";
   node->Then->Accept(this);
 }
+
+void PrintVisitor::VisitorDoWhileStmtNode(DoWhileStmtNode *node) {
+  Content += "do ";
+  node->Stmt->Accept(this);
+  Content += "while";
+  Content += "(";
+  node->Cond->Accept(this);
+  Content += ")";
+  Content += ";";
+}
+
+void PrintVisitor::VisitorForStmtNode(ForStmtNode *node) {
+  Content += "for";
+  Content += "(";
+  if (node->Init)
+    node->Init->Accept(this);
+  Content += ";";
+  if (node->Cond)
+    node->Cond->Accept(this);
+  Content += ";";
+  if (node->Inc)
+    node->Inc->Accept(this);
+  Content += ")";
+  node->Stmt->Accept(this);
+}

@@ -57,3 +57,13 @@ void WhileStmtNode::Accept(AstVisitor *visitor)
 {
   visitor->VisitorWhileStmtNode(this);
 }
+
+void DoWhileStmtNode::Accept(AstVisitor *visitor)
+{
+  visitor->VisitorDoWhileStmtNode(this);
+}
+
+void ForStmtNode::Accept(AstVisitor *visitor)
+{
+  visitor->VisitorForStmtNode(this);
+}

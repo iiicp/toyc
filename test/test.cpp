@@ -235,3 +235,31 @@ TEST_CASE("C100_parser6", "[parser]")
 
   REQUIRE("a=0;b=1;while(a<10){a=a+1;b=a+b;}b;" == visitor.Content);
 }
+
+TEST_CASE("C100_parser7", "[parser]")
+{
+  const char *code = "a=0; b=1; do {a = a+1; b=a+b;} while (a < 10); b;";
+  Lexer lexer(code);
+  lexer.GetNextToken();
+  Parser parser(lexer);
+  auto root = parser.Parse();
+
+  PrintVisitor visitor;
+  root->Accept(&visitor);
+
+  REQUIRE("a=0;b=1;do {a=a+1;b=a+b;}while(a<10);b;" == visitor.Content);
+}
+
+TEST_CASE("C100_parser8", "[parser]")
+{
+  const char *code = "a=0; b=1; for(a=0;a<10;a=a+1) b=b+1;";
+  Lexer lexer(code);
+  lexer.GetNextToken();
+  Parser parser(lexer);
+  auto root = parser.Parse();
+
+  PrintVisitor visitor;
+  root->Accept(&visitor);
+
+  REQUIRE("a=0;b=1;for(a=0;a<10;a=a+1)b=b+1;" == visitor.Content);
+}
