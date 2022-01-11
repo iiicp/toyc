@@ -20,3 +20,22 @@ a=3; if (a!=4) a = 5;
 a=3; if (a!=4) a = 5; else a = 6;     
 a=3; if (a!=4) {a = 5;a = a + a;} else {a = a*a; a = a + 10;}
 day7: 编译 a=0; b=1; while (a < 10) {a = a+1; b=a+b;} b;
+day8: 支持文件读入，编译do-while和for语句，现在能编译如下语句:
+
+i = 0;
+j = 0;
+while (i < 100) {
+  j = i + j;
+  i = i + 1;
+}
+k = 0;
+do {
+j = j - 1;
+k = k + 1;
+}while (j>0);
+
+for (;k>0;k=k-1)
+  j = j + 1;
+j;
+
+
