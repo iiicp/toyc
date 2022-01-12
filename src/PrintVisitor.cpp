@@ -10,6 +10,7 @@
 
 #include "PrintVisitor.h"
 #include <stdio.h>
+#include <cassert>
 
 using namespace C100;
 

@@ -12,6 +12,7 @@
 #include <cstring>
 #include "Diag.h"
 #include <string>
+#include <cassert>
 
 using namespace C100;
 

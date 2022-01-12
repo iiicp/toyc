@@ -12,6 +12,7 @@
 #define C100_LEXER_H
 
 #include <string_view>
+#include <memory>
 
 namespace C100
 {
