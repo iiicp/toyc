@@ -30,6 +30,7 @@ namespace C100
       Identifier,
       Semicolon,
       Assign,
+      Comma,
       Equal,
       PipeEqual,
       Greater,

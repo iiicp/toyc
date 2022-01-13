@@ -154,7 +154,7 @@ TEST_CASE("C100_lexer5", "[lexer]") {
 
 TEST_CASE("C100_parser1", "[parser]")
 {
-    const char *code = "5 + (1-  3)*4/2;a+2;";
+    const char *code = "test(){ 5 + (1-  3)*4/2;a+2;}";
     Lexer lexer(code);
     lexer.GetNextToken();
     Parser parser(lexer);
@@ -163,12 +163,12 @@ TEST_CASE("C100_parser1", "[parser]")
     PrintVisitor visitor;
     root->Accept(&visitor);
 
-    REQUIRE("5+1-3*4/2;a+2;" == visitor.Content);
+    REQUIRE("test(){5+1-3*4/2;a+2;}" == visitor.Content);
 }
 
 TEST_CASE("C100_parser2", "[parser]")
 {
-  const char *code = "a = 3;a; a + 5 + (1-  3)*4/2;";
+  const char *code = "test(){a = 3;a; a + 5 + (1-  3)*4/2;}";
   Lexer lexer(code);
   lexer.GetNextToken();
   Parser parser(lexer);
@@ -177,12 +177,12 @@ TEST_CASE("C100_parser2", "[parser]")
   PrintVisitor visitor;
   root->Accept(&visitor);
 
-  REQUIRE("a=3;a;a+5+1-3*4/2;" == visitor.Content);
+  REQUIRE("test(){a=3;a;a+5+1-3*4/2;}" == visitor.Content);
 }
 
 TEST_CASE("C100_parser3", "[parser]")
 {
-  const char *code = "a==3;a!=3;a>3;a>=3;a<3;a<=3;";
+  const char *code = "test(){a==3;a!=3;a>3;a>=3;a<3;a<=3;}";
   Lexer lexer(code);
   lexer.GetNextToken();
   Parser parser(lexer);
@@ -191,12 +191,12 @@ TEST_CASE("C100_parser3", "[parser]")
   PrintVisitor visitor;
   root->Accept(&visitor);
 
-  REQUIRE("a==3;a!=3;a>3;a>=3;a<3;a<=3;" == visitor.Content);
+  REQUIRE("test(){a==3;a!=3;a>3;a>=3;a<3;a<=3;}" == visitor.Content);
 }
 
 TEST_CASE("C100_parser4", "[parser]")
 {
-  const char *code = "a=3;if (a != 3) a = 3; else a = a * a;";
+  const char *code = "test(){a=3;if (a != 3) a = 3; else a = a * a;}";
   Lexer lexer(code);
   lexer.GetNextToken();
   Parser parser(lexer);
@@ -205,12 +205,12 @@ TEST_CASE("C100_parser4", "[parser]")
   PrintVisitor visitor;
   root->Accept(&visitor);
 
-  REQUIRE("a=3;if(a!=3)a=3;else a=a*a;" == visitor.Content);
+  REQUIRE("test(){a=3;if(a!=3)a=3;else a=a*a;}" == visitor.Content);
 }
 
 TEST_CASE("C100_parser5", "[parser]")
 {
-  const char *code = "a=3;if (a != 3) {a = 3;} else a = a * a;";
+  const char *code = "test(){a=3;if (a != 3) {a = 3;} else a = a * a;}";
   Lexer lexer(code);
   lexer.GetNextToken();
   Parser parser(lexer);
@@ -219,12 +219,12 @@ TEST_CASE("C100_parser5", "[parser]")
   PrintVisitor visitor;
   root->Accept(&visitor);
 
-  REQUIRE("a=3;if(a!=3){a=3;}else a=a*a;" == visitor.Content);
+  REQUIRE("test(){a=3;if(a!=3){a=3;}else a=a*a;}" == visitor.Content);
 }
 
 TEST_CASE("C100_parser6", "[parser]")
 {
-  const char *code = "a=0; b=1; while (a < 10) {a = a+1; b=a+b;} b;";
+  const char *code = "test(){a=0; b=1; while (a < 10) {a = a+1; b=a+b;} b;}";
   Lexer lexer(code);
   lexer.GetNextToken();
   Parser parser(lexer);
@@ -233,12 +233,12 @@ TEST_CASE("C100_parser6", "[parser]")
   PrintVisitor visitor;
   root->Accept(&visitor);
 
-  REQUIRE("a=0;b=1;while(a<10){a=a+1;b=a+b;}b;" == visitor.Content);
+  REQUIRE("test(){a=0;b=1;while(a<10){a=a+1;b=a+b;}b;}" == visitor.Content);
 }
 
 TEST_CASE("C100_parser7", "[parser]")
 {
-  const char *code = "a=0; b=1; do {a = a+1; b=a+b;} while (a < 10); b;";
+  const char *code = "test(){a=0; b=1; do {a = a+1; b=a+b;} while (a < 10); b;}";
   Lexer lexer(code);
   lexer.GetNextToken();
   Parser parser(lexer);
@@ -247,12 +247,12 @@ TEST_CASE("C100_parser7", "[parser]")
   PrintVisitor visitor;
   root->Accept(&visitor);
 
-  REQUIRE("a=0;b=1;do {a=a+1;b=a+b;}while(a<10);b;" == visitor.Content);
+  REQUIRE("test(){a=0;b=1;do {a=a+1;b=a+b;}while(a<10);b;}" == visitor.Content);
 }
 
 TEST_CASE("C100_parser8", "[parser]")
 {
-  const char *code = "a=0; b=1; for(a=0;a<10;a=a+1) b=b+1;";
+  const char *code = "test(){a=0; b=1; for(a=0;a<10;a=a+1) b=b+1;}";
   Lexer lexer(code);
   lexer.GetNextToken();
   Parser parser(lexer);
@@ -261,5 +261,5 @@ TEST_CASE("C100_parser8", "[parser]")
   PrintVisitor visitor;
   root->Accept(&visitor);
 
-  REQUIRE("a=0;b=1;for(a=0;a<10;a=a+1)b=b+1;" == visitor.Content);
+  REQUIRE("test(){a=0;b=1;for(a=0;a<10;a=a+1)b=b+1;}" == visitor.Content);
 }

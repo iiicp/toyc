@@ -14,6 +14,7 @@
 #include <memory>
 #include <list>
 #include <string_view>
+#include <vector>
 
 namespace C100
 {
@@ -35,8 +36,18 @@ namespace C100
   class ProgramNode : public AstNode
   {
   public:
-    std::list<std::shared_ptr<AstNode>> Stmts;
-    std::list<std::shared_ptr<Var>> LocalVars;
+    std::list<std::shared_ptr<AstNode>> Funcs;
+    void Accept(AstVisitor *visitor) override;
+  };
+
+  class FunctionNode : public AstNode
+  {
+  public:
+    std::string_view FuncName;
+    std::vector<std::shared_ptr<Var>> Params{};
+    std::list<std::shared_ptr<Var>> Locals{};
+    std::list<std::shared_ptr<AstNode>> Stmts{};
+
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -142,17 +153,18 @@ namespace C100
   {
   public:
     virtual ~AstVisitor(){}
-    virtual void VisitorProgramNode(ProgramNode *node){};
-    virtual void VisitorExprStmtNode(ExprStmtNode *node){};
-    virtual void VisitorIfStmtNode(IfStmtNode *node){};
-    virtual void VisitorWhileStmtNode(WhileStmtNode *node){}
-    virtual void VisitorDoWhileStmtNode(DoWhileStmtNode *node){}
-    virtual void VisitorForStmtNode(ForStmtNode *node){}
-    virtual void VisitorBlockStmtNode(BlockStmtNode *node) {}
-    virtual void VisitorAssignExprNode(AssignExprNode *node){};
-    virtual void VisitorBinaryNode(BinaryNode *node){};
-    virtual void VisitorConstantNode(ConstantNode *node){};
-    virtual void VisitorVarExprNode(VarExprNode *node){};
+    virtual void VisitorProgramNode(ProgramNode *node) = 0;
+    virtual void VisitorFunctionNode(FunctionNode *node) = 0;
+    virtual void VisitorExprStmtNode(ExprStmtNode *node) = 0;
+    virtual void VisitorIfStmtNode(IfStmtNode *node) = 0;
+    virtual void VisitorWhileStmtNode(WhileStmtNode *node) = 0;
+    virtual void VisitorDoWhileStmtNode(DoWhileStmtNode *node) = 0;
+    virtual void VisitorForStmtNode(ForStmtNode *node) = 0;
+    virtual void VisitorBlockStmtNode(BlockStmtNode *node)  = 0;
+    virtual void VisitorAssignExprNode(AssignExprNode *node) = 0;
+    virtual void VisitorBinaryNode(BinaryNode *node) = 0;
+    virtual void VisitorConstantNode(ConstantNode *node) = 0;
+    virtual void VisitorVarExprNode(VarExprNode *node) = 0;
   };
 }
 

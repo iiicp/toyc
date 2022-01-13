@@ -10,40 +10,56 @@
 
 #include "CodeGen.h"
 #include <cassert>
+#include <string>
 
 using namespace C100;
 
 void CodeGen::VisitorProgramNode(ProgramNode *node)
 {
-    printf("\t.text\n");
+  for (auto &f : node->Funcs)
+    f->Accept(this);
+}
+
+void CodeGen::VisitorFunctionNode(FunctionNode *node)
+{
+  printf("\t.text\n");
+  std::string name(node->FuncName);
 #ifdef __linux__
-    printf("\t.globl prog\n");
-    printf("prog:\n");
+  printf("\t.globl %s\n", name.data());
+  printf("%s:\n",name.data());
 #else
-    /// macos
-    printf("\t.globl _prog\n");
-    printf("_prog:\n");
+  /// macos
+  printf("\t.globl _%s\n",name.data());
+  printf("_%s:\n",name.data());
 #endif
 
-    int stackSize = 0;
-    for (auto &V : node->LocalVars)
-    {
-      stackSize += 8;
-      V->Offset = stackSize * -1;
-    }
+  int stackSize = 0;
+  for (auto &V : node->Locals)
+  {
+    stackSize += 8;
+    V->Offset = stackSize * -1;
+  }
 
-    printf("\tpush %%rbp\n");
-    printf("\tmov %%rsp, %%rbp\n");
-    printf("\tsub $%d, %%rsp\n", stackSize);
+  stackSize = AlignTo(stackSize, 16);
 
-    for (auto &S : node->Stmts) {
-      S->Accept(this);
-      assert(StackLevel == 0);
-    }
+  printf("\tpush %%rbp\n");
+  printf("\tmov %%rsp, %%rbp\n");
+  printf("\tsub $%d, %%rsp\n", stackSize);
 
-    printf("\tmov %%rbp, %%rsp\n");
-    printf("\tpop %%rbp\n");
-    printf("\tret\n");
+  const char *reg[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8d", "%r9d"};
+
+  for (int i = 0; i < node->Params.size(); ++i) {
+    printf("\tmov %s, %d(%%rbp)\n", reg[i], node->Params[i]->Offset);
+  }
+
+  for (auto &S : node->Stmts) {
+    S->Accept(this);
+    assert(StackLevel == 0);
+  }
+
+  printf("\tmov %%rbp, %%rsp\n");
+  printf("\tpop %%rbp\n");
+  printf("\tret\n");
 }
 
 void CodeGen::VisitorBinaryNode(BinaryNode *node)
@@ -223,5 +239,9 @@ void CodeGen::VisitorForStmtNode(ForStmtNode *node)
   }
   printf("\tjmp .L.begin_%d\n", n);
   printf(".L.end_%d:\n", n);
+}
+
+int CodeGen::AlignTo(int size, int align) {
+  return (size + align - 1) / align * align;
 }
 

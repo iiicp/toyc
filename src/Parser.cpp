@@ -17,10 +17,42 @@ using namespace C100;
 std::shared_ptr<ProgramNode> Parser::Parse()
 {
   auto node = std::make_shared<ProgramNode>();
-  Locals = &node->LocalVars;
   while (Lex.CurrentToken->Kind != TokenKind::Eof) {
+    node->Funcs.push_back(ParseFunction());
+  }
+
+  return node;
+}
+
+std::shared_ptr<AstNode> Parser::ParseFunction()
+{
+  auto node = std::make_shared<FunctionNode>();
+  Locals = &node->Locals;
+  LocalsMap.clear();
+
+  node->FuncName = Lex.CurrentToken->Content;
+  Lex.ExpectToken(TokenKind::Identifier);
+  Lex.ExpectToken(TokenKind::LParent);
+  if (Lex.CurrentToken->Kind != TokenKind::RParent) {
+    auto tok = Lex.CurrentToken;
+    ParsePrimaryExpr();
+    node->Params.push_back(LocalsMap[tok->Content]);
+
+    while (Lex.CurrentToken->Kind == TokenKind::Comma) {
+      Lex.GetNextToken();
+
+      auto tok = Lex.CurrentToken;
+      ParsePrimaryExpr();
+      node->Params.push_back(LocalsMap[tok->Content]);
+    }
+  }
+  Lex.ExpectToken(TokenKind::RParent);
+
+  Lex.ExpectToken(TokenKind::LBrace);
+  while (Lex.CurrentToken->Kind != TokenKind::RBrace) {
     node->Stmts.push_back(ParseStmt());
   }
+  Lex.ExpectToken(TokenKind::RBrace);
 
   return node;
 }

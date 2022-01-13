@@ -24,6 +24,7 @@ public:
   void VisitorProgramNode(ProgramNode *node) override;
 
 private:
+  void VisitorFunctionNode(FunctionNode *node) override;
   void VisitorExprStmtNode(ExprStmtNode *node) override;
   void VisitorAssignExprNode(AssignExprNode *node) override;
   void VisitorIfStmtNode(IfStmtNode *node) override;

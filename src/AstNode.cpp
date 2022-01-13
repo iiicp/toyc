@@ -67,3 +67,7 @@ void ForStmtNode::Accept(AstVisitor *visitor)
 {
   visitor->VisitorForStmtNode(this);
 }
+
+void FunctionNode::Accept(AstVisitor *visitor) {
+  visitor->VisitorFunctionNode(this);
+}

@@ -24,6 +24,7 @@ namespace C100 {
     void VisitorProgramNode(ProgramNode *node) override;
 
   private:
+    void VisitorFunctionNode(FunctionNode *node) override;
     void VisitorExprStmtNode(ExprStmtNode *node)override;
     void VisitorAssignExprNode(AssignExprNode *node)override;
     void VisitorIfStmtNode(IfStmtNode *node) override;
@@ -37,6 +38,8 @@ namespace C100 {
 
     void Push();
     void Pop(const char *reg);
+
+    int AlignTo(int size, int align);
   };
 }
 

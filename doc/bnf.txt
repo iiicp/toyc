@@ -37,7 +37,9 @@ PrimaryExpr          :=      Num
                      :=      Identifier
 
 -----------------------------------------
-Prog                 :=      Stmt*
+Prog                 :=      Function*
+Function             :=      identifier "("FuncArg?")" "{"Stmt*"}"
+FuncArg              :=      identifier (, identifier)*
 Stmt                 :=      Expr?;
                      :=      if "(" Expr ")" Stmt
                      :=      if "(" Expr ")" Stmt Else Stmt

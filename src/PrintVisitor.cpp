@@ -16,8 +16,25 @@ using namespace C100;
 
 void PrintVisitor::VisitorProgramNode(ProgramNode *node)
 {
-  for (auto &S : node->Stmts)
-    S->Accept(this);
+  for (auto &f : node->Funcs)
+    f->Accept(this);
+}
+
+void PrintVisitor::VisitorFunctionNode(FunctionNode *node)
+{
+  Content += std::string(node->FuncName);
+  Content += "(";
+  for (int i = 0; i < node->Params.size(); ++i) {
+    Content += std::string(node->Params[i]->Name);
+    if (i != node->Params.size() - 1) {
+      Content += ",";
+    }
+  }
+  Content += ")";
+  Content += "{";
+  for (auto &s : node->Stmts)
+    s->Accept(this);
+  Content += "}";
 }
 
 void PrintVisitor::VisitorBinaryNode(BinaryNode *node)
