@@ -263,3 +263,17 @@ TEST_CASE("C100_parser8", "[parser]")
 
   REQUIRE("test(){a=0;b=1;for(a=0;a<10;a=a+1)b=b+1;}" == visitor.Content);
 }
+
+TEST_CASE("C100_parser9", "[parser]")
+{
+  const char *code = "sum(n){a=0; b=0; for(a=0;a<n;a=a+1) b=b+1;}test(){return sum(100);}";
+  Lexer lexer(code);
+  lexer.GetNextToken();
+  Parser parser(lexer);
+  auto root = parser.Parse();
+
+  PrintVisitor visitor;
+  root->Accept(&visitor);
+
+  REQUIRE("sum(n){a=0;b=0;for(a=0;a<n;a=a+1)b=b+1;}test(){return sum(100);}" == visitor.Content);
+}

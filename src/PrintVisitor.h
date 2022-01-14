@@ -25,6 +25,7 @@ public:
 
 private:
   void VisitorFunctionNode(FunctionNode *node) override;
+  void VisitorFuncCallNode(FuncCallNode *node) override;
   void VisitorExprStmtNode(ExprStmtNode *node) override;
   void VisitorAssignExprNode(AssignExprNode *node) override;
   void VisitorIfStmtNode(IfStmtNode *node) override;
@@ -32,6 +33,7 @@ private:
   void VisitorDoWhileStmtNode(DoWhileStmtNode *node) override;
   void VisitorForStmtNode(ForStmtNode *node) override;
   void VisitorBlockStmtNode(BlockStmtNode *node) override;
+  void VisitorReturnStmtNode(ReturnStmtNode *node) override;
   void VisitorBinaryNode(BinaryNode *node) override;
   void VisitorConstantNode(ConstantNode *node) override;
   void VisitorVarExprNode(VarExprNode *node) override;

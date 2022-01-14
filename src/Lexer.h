@@ -42,6 +42,7 @@ namespace C100
       While,
       Do,
       For,
+      Return,
       Eof
   };
 
@@ -67,6 +68,12 @@ namespace C100
     int Cursor{0};
     int Line{0};
     int LineHead{0};
+
+    char PeekPointCurChar;
+    int PeekPointCursor;
+    int PeekPointLine;
+    int PeekPointLineHead;
+    std::shared_ptr<Token> PeekPointCurrentToken;
   public:
     std::shared_ptr<Token> CurrentToken;
     std::string_view SourceCode;
@@ -77,6 +84,10 @@ namespace C100
     void GetNextToken();
     void GetNextChar();
     void ExpectToken(TokenKind kind);
+
+    void BeginPeekToken();
+    void EndPeekToken();
+
   private:
     bool IsLetter();
     bool IsDigit();

@@ -104,6 +104,13 @@ namespace C100
     void Accept(AstVisitor *visitor) override;
   };
 
+  class ReturnStmtNode : public AstNode
+  {
+  public:
+    std::shared_ptr<AstNode> Lhs;
+    void Accept(AstVisitor *visitor) override;
+  };
+
   class AssignExprNode : public AstNode
   {
   public:
@@ -149,18 +156,29 @@ namespace C100
     void Accept(AstVisitor *visitor) override;
   };
 
+  class FuncCallNode : public AstNode
+  {
+  public:
+    std::string_view FuncName;
+    std::vector<std::shared_ptr<AstNode>> Args;
+
+    void Accept(AstVisitor *visitor) override;
+  };
+
   class AstVisitor
   {
   public:
     virtual ~AstVisitor(){}
     virtual void VisitorProgramNode(ProgramNode *node) = 0;
     virtual void VisitorFunctionNode(FunctionNode *node) = 0;
+    virtual void VisitorFuncCallNode(FuncCallNode *node) = 0;
     virtual void VisitorExprStmtNode(ExprStmtNode *node) = 0;
     virtual void VisitorIfStmtNode(IfStmtNode *node) = 0;
     virtual void VisitorWhileStmtNode(WhileStmtNode *node) = 0;
     virtual void VisitorDoWhileStmtNode(DoWhileStmtNode *node) = 0;
     virtual void VisitorForStmtNode(ForStmtNode *node) = 0;
     virtual void VisitorBlockStmtNode(BlockStmtNode *node)  = 0;
+    virtual void VisitorReturnStmtNode(ReturnStmtNode *node)  = 0;
     virtual void VisitorAssignExprNode(AssignExprNode *node) = 0;
     virtual void VisitorBinaryNode(BinaryNode *node) = 0;
     virtual void VisitorConstantNode(ConstantNode *node) = 0;

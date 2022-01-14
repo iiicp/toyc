@@ -111,8 +111,15 @@ std::shared_ptr<AstNode> Parser::ParsePrimaryExpr()
         Lex.GetNextToken();
         return node;
     }else if (Lex.CurrentToken->Kind == TokenKind::Identifier) {
-        auto node = std::make_shared<VarExprNode>();
 
+        Lex.BeginPeekToken();
+        Lex.GetNextToken();
+        if (Lex.CurrentToken->Kind == TokenKind::LParent) {
+          Lex.EndPeekToken();
+          return ParseFuncCallNode();
+        }
+        Lex.EndPeekToken();
+        auto node = std::make_shared<VarExprNode>();
         std::shared_ptr<Var> obj = FindLocalVar(Lex.CurrentToken->Content);
         if (!obj) {
           obj = MakeLocalVar(Lex.CurrentToken->Content);
@@ -185,6 +192,13 @@ std::shared_ptr<AstNode> Parser::ParseStmt()
       node->Stmts.push_back(ParseStmt());
     }
     Lex.ExpectToken(TokenKind::RBrace);
+    return node;
+  }
+  else if (Lex.CurrentToken->Kind == TokenKind::Return) {
+    auto node = std::make_shared<ReturnStmtNode>();
+    Lex.GetNextToken();
+    node->Lhs = ParseExpr();
+    Lex.ExpectToken(TokenKind::Semicolon);
     return node;
   }
   else {
@@ -267,5 +281,22 @@ std::shared_ptr<Var> Parser::MakeLocalVar(std::string_view name) {
   Locals->push_front(obj);
   LocalsMap[name] = obj;
   return obj;
+}
+
+std::shared_ptr<AstNode> Parser::ParseFuncCallNode() {
+
+  auto node = std::make_shared<FuncCallNode>();
+  node->FuncName = Lex.CurrentToken->Content;
+  Lex.ExpectToken(TokenKind::Identifier);
+  Lex.ExpectToken(TokenKind::LParent);
+  if (Lex.CurrentToken->Kind != TokenKind::RParent) {
+    node->Args.push_back(ParseAssignExpr());
+    while (Lex.CurrentToken->Kind == TokenKind::Comma) {
+      Lex.GetNextToken();
+      node->Args.push_back(ParseAssignExpr());
+    }
+  }
+  Lex.ExpectToken(TokenKind::RParent);
+  return node;
 }
 

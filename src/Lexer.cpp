@@ -145,6 +145,8 @@ void Lexer::GetNextToken() {
         kind = TokenKind::Do;
       }else if (content == "for") {
         kind = TokenKind::For;
+      }else if (content == "return") {
+        kind = TokenKind::Return;
       }
     }else {
       DiagE(SourceCode, Location, "current '%c' is illegal", CurChar);
@@ -206,4 +208,21 @@ char Lexer::PeekChar(int distance)
     }else {
       return '\0';
     }
+}
+
+
+void Lexer::BeginPeekToken() {
+  PeekPointCurChar = CurChar;
+  PeekPointCursor = Cursor;
+  PeekPointLine = Line;
+  PeekPointLineHead = LineHead;
+  PeekPointCurrentToken = CurrentToken;
+}
+
+void Lexer::EndPeekToken() {
+  CurChar = PeekPointCurChar;
+  Cursor = PeekPointCursor;
+  Line = PeekPointLine;
+  LineHead = PeekPointLineHead;
+  CurrentToken = PeekPointCurrentToken;
 }

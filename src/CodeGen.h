@@ -12,6 +12,7 @@
 #define C100_CODEGEN_H
 
 #include "AstNode.h"
+#include <string>
 
 namespace C100 {
   class CodeGen : public AstVisitor
@@ -19,12 +20,15 @@ namespace C100 {
   private:
     int StackLevel{0};
     int Sequence{0};
+    const char *Reg64[6] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+    std::string CurrentFuncName;
   public:
     CodeGen() {}
     void VisitorProgramNode(ProgramNode *node) override;
 
   private:
     void VisitorFunctionNode(FunctionNode *node) override;
+    void VisitorFuncCallNode(FuncCallNode *node) override;
     void VisitorExprStmtNode(ExprStmtNode *node)override;
     void VisitorAssignExprNode(AssignExprNode *node)override;
     void VisitorIfStmtNode(IfStmtNode *node) override;
@@ -32,6 +36,7 @@ namespace C100 {
     void VisitorDoWhileStmtNode(DoWhileStmtNode *node) override;
     void VisitorForStmtNode(ForStmtNode *node) override;
     void VisitorBlockStmtNode(BlockStmtNode *node) override;
+    void VisitorReturnStmtNode(ReturnStmtNode *node) override;
     void VisitorBinaryNode(BinaryNode *node) override;
     void VisitorConstantNode(ConstantNode *node) override;
     void VisitorVarExprNode(VarExprNode *node)override;

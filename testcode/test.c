@@ -1,25 +1,26 @@
+add(a,b,c,d,e,f) {
+  return a+b+c+d+e+f;
+}
+
+ret() {
+  return 100;
+}
+
 sum(n) {
   res = 0;
-  for (i=0;i<n;i=i+1) {
+  for (i=0;i<=n;i=i+1) {
     res = res + i;
   }
-  res;
+  return res;
+}
+
+fib(n) {
+    if (n <= 1) {
+      return 1;
+    }
+    return fib(n-1) + fib(n-2);
 }
 
 prog() {
-  i = 0;
-  j = 0;
-  while (i < 100) {
-    j = i + j;
-    i = i + 1;
-  }
-  k = 0;
-  do {
-    j = j - 1;
-    k = k + 1;
-  } while (j > 0);
-
-  for (; k > 0; k = k - 1)
-    j = j + 1;
-  j;
+  return fib(20);
 }

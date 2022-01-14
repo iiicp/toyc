@@ -10,7 +10,6 @@
 
 #include "CodeGen.h"
 #include <cassert>
-#include <string>
 
 using namespace C100;
 
@@ -23,14 +22,14 @@ void CodeGen::VisitorProgramNode(ProgramNode *node)
 void CodeGen::VisitorFunctionNode(FunctionNode *node)
 {
   printf("\t.text\n");
-  std::string name(node->FuncName);
+  CurrentFuncName = node->FuncName;
 #ifdef __linux__
   printf("\t.globl %s\n", name.data());
   printf("%s:\n",name.data());
 #else
   /// macos
-  printf("\t.globl _%s\n",name.data());
-  printf("_%s:\n",name.data());
+  printf("\t.globl _%s\n",CurrentFuncName.data());
+  printf("_%s:\n",CurrentFuncName.data());
 #endif
 
   int stackSize = 0;
@@ -46,17 +45,15 @@ void CodeGen::VisitorFunctionNode(FunctionNode *node)
   printf("\tmov %%rsp, %%rbp\n");
   printf("\tsub $%d, %%rsp\n", stackSize);
 
-  const char *reg[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8d", "%r9d"};
-
   for (int i = 0; i < node->Params.size(); ++i) {
-    printf("\tmov %s, %d(%%rbp)\n", reg[i], node->Params[i]->Offset);
+    printf("\tmov %s, %d(%%rbp)\n", Reg64[i], node->Params[i]->Offset);
   }
 
   for (auto &S : node->Stmts) {
     S->Accept(this);
     assert(StackLevel == 0);
   }
-
+  printf(".LReturn_%s:\n", CurrentFuncName.data());
   printf("\tmov %%rbp, %%rsp\n");
   printf("\tpop %%rbp\n");
   printf("\tret\n");
@@ -243,5 +240,28 @@ void CodeGen::VisitorForStmtNode(ForStmtNode *node)
 
 int CodeGen::AlignTo(int size, int align) {
   return (size + align - 1) / align * align;
+}
+
+void CodeGen::VisitorFuncCallNode(FuncCallNode *node) {
+  for(auto &arg : node->Args) {
+    arg->Accept(this);
+    Push();
+  }
+  for(int i = node->Args.size()-1; i >= 0; i--) {
+    Pop(Reg64[i]);
+  }
+
+  std::string FuncName(node->FuncName);
+
+#ifdef __linux__
+  printf("\tcall %s\n",FuncName.data());
+#else
+  printf("\tcall _%s\n",FuncName.data());
+#endif
+}
+
+void CodeGen::VisitorReturnStmtNode(ReturnStmtNode *node) {
+  node->Lhs->Accept(this);
+  printf("\tjmp .LReturn_%s\n",CurrentFuncName.data());
 }
 

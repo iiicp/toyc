@@ -47,6 +47,7 @@ Stmt                 :=      Expr?;
                      :=      do Stmt while "(" Expr ")" ";"
                      :=      for "("Expr?;Expr?;Expr?")" Stmt
                      :=      "{" Stmt* "}"
+                     :=      return Expr ";"
 Expr                 :=      AssignExpr
 AssignExpr           :=      EqualityExpr
                      :=      EqualityExpr = AssignExpr
@@ -66,4 +67,5 @@ MultiExpr            :=      PrimaryExpr
                      :=      MultiExpr / PrimaryExpr
 PrimaryExpr          :=      Num
                      :=      (Expr)
-                     :=      Identifier
+                     :=      Identifier("("Args?")")?
+Args                 :=      AssignExpr(,AssignExpr)*

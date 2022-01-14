@@ -152,3 +152,21 @@ void PrintVisitor::VisitorForStmtNode(ForStmtNode *node) {
   Content += ")";
   node->Stmt->Accept(this);
 }
+
+void PrintVisitor::VisitorFuncCallNode(FuncCallNode *node) {
+  Content += node->FuncName;
+  Content += "(";
+  for (int i = 0; i < node->Args.size(); ++i) {
+    node->Args[i]->Accept(this);
+    if (i != node->Args.size()-1) {
+      Content += ",";
+    }
+  }
+  Content += ")";
+}
+
+void PrintVisitor::VisitorReturnStmtNode(ReturnStmtNode *node) {
+  Content += "return ";
+  node->Lhs->Accept(this);
+  Content += ";";
+}

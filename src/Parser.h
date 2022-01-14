@@ -37,6 +37,7 @@ namespace C100
     std::shared_ptr<AstNode> ParseMultiExpr();
     std::shared_ptr<AstNode> ParsePrimaryExpr();
 
+    std::shared_ptr<AstNode> ParseFuncCallNode();
     std::shared_ptr<Var> FindLocalVar(std::string_view name);
     std::shared_ptr<Var> MakeLocalVar(std::string_view name);
   };
