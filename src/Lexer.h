@@ -43,6 +43,7 @@ namespace C100
       Do,
       For,
       Return,
+      Int,
       Eof
   };
 

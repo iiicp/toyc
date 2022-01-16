@@ -13,6 +13,7 @@
 #include "Lexer.h"
 #include "AstNode.h"
 #include <unordered_map>
+#include "Type.h"
 
 namespace C100
 {
@@ -37,9 +38,15 @@ namespace C100
     std::shared_ptr<AstNode> ParseMultiExpr();
     std::shared_ptr<AstNode> ParsePrimaryExpr();
 
+    bool IsTypeName();
+    std::shared_ptr<Type> ParseDeclarationSpec();
+    std::shared_ptr<Type> ParseDeclarator(std::shared_ptr<Type> baseType, std::shared_ptr<Token> &tok);
+    std::shared_ptr<Type> ParseTypeSuffix(std::shared_ptr<Type> baseType);
+
     std::shared_ptr<AstNode> ParseFuncCallNode();
     std::shared_ptr<Var> FindLocalVar(std::string_view name);
-    std::shared_ptr<Var> MakeLocalVar(std::string_view name);
+    std::shared_ptr<Var> MakeLocalVar(std::string_view name, std::shared_ptr<Type> ty);
+    std::shared_ptr<VarExprNode> MakeVarNode(std::shared_ptr<Var> var);
   };
 }
 

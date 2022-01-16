@@ -11,6 +11,7 @@
 #include "PrintVisitor.h"
 #include <stdio.h>
 #include <cassert>
+#include "Type.h"
 
 using namespace C100;
 
@@ -22,13 +23,18 @@ void PrintVisitor::VisitorProgramNode(ProgramNode *node)
 
 void PrintVisitor::VisitorFunctionNode(FunctionNode *node)
 {
+  Content += "int ";
   Content += std::string(node->FuncName);
   Content += "(";
-  for (int i = 0; i < node->Params.size(); ++i) {
-    Content += std::string(node->Params[i]->Name);
+  int sz = node->Params.size();
+  int i = 0;
+  for (auto &var : node->Params) {
+    Content += "int ";
+    Content += std::string(var->Name);
     if (i != node->Params.size() - 1) {
       Content += ",";
     }
+    i++;
   }
   Content += ")";
   Content += "{";

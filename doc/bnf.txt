@@ -38,16 +38,29 @@ PrimaryExpr          :=      Num
 
 -----------------------------------------
 Prog                 :=      Function*
-Function             :=      identifier "("FuncArg?")" "{"Stmt*"}"
-FuncArg              :=      identifier (, identifier)*
+Function             :=      DeclarationSpec Declarator "{"Stmt*"}"
+DeclarationSpec      :=      int
+Declarator           :=      (*)* identifier TypeSuffix
+TypeSuffix           :=      "("FuncArg?")"
+                     :=
+FuncArg              :=      DeclarationSpec Declarator (, DeclarationSpec Declarator)*
 Stmt                 :=      Expr?;
-                     :=      if "(" Expr ")" Stmt
+                     :=      IfStmt
+                     :=      WhileStmt
+                     :=      DoWhileStmt
+                     :=      ForStmt
+                     :=      BlockStmt
+                     :=      ReturnStmt
+                     :=      DeclarationStmt
+IfStmt               :=      if "(" Expr ")" Stmt
                      :=      if "(" Expr ")" Stmt Else Stmt
-                     :=      while "(" Expr ")" Stmt
-                     :=      do Stmt while "(" Expr ")" ";"
-                     :=      for "("Expr?;Expr?;Expr?")" Stmt
-                     :=      "{" Stmt* "}"
-                     :=      return Expr ";"
+WhileStmt            :=      while "(" Expr ")" Stmt
+DoWhileStmt          :=      do Stmt while "(" Expr ")" ";"
+ForStmt              :=      for "("Expr?;Expr?;Expr?")" Stmt
+BlockStmt            :=      "{" Stmt* "}"
+ReturnStmt           :=      return Expr ";"
+DeclarationStmt      :=      DeclarationSpec Declarator(= Expr)? (, Declarator(= Expr)?)* ";"
+                     :=      DeclarationSpec ";"
 Expr                 :=      AssignExpr
 AssignExpr           :=      EqualityExpr
                      :=      EqualityExpr = AssignExpr

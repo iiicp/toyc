@@ -23,15 +23,24 @@ day7: 编译 a=0; b=1; while (a < 10) {a = a+1; b=a+b;} b;
 day8: 支持文件读入，编译do-while和for语句
 day9: 支持函数定义, 现在能编译如下语句
 day10: 支持函数调用，支持递归，能编译
+day11: 支持类型，函数类型，变量声明语句，能编译正式的c代码了
 
-fib(n) {
+int sum(int n) {
+  int res = 0, i = 0;
+  for (i=0;i<=n;i=i+1) {
+    res = res + i;
+  }
+  return res;
+}
+
+int fib(int n) {
     if (n <= 1)
       return 1;
     return fib(n-1) + fib(n-2);
 }
 
-prog() {
-  return fib(20);
+int prog() {
+  return fib(sum(4));
 }
 
 

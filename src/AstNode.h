@@ -19,9 +19,11 @@
 namespace C100
 {
   class AstVisitor;
+  class Type;
   class AstNode
   {
   public:
+    std::shared_ptr<Type> Ty;
     virtual ~AstNode() {}
     virtual void Accept(AstVisitor *visitor) {};
   };
@@ -30,6 +32,7 @@ namespace C100
   {
   public:
     std::string_view Name;
+    std::shared_ptr<Type> Ty;
     int Offset;
   };
 
@@ -44,7 +47,7 @@ namespace C100
   {
   public:
     std::string_view FuncName;
-    std::vector<std::shared_ptr<Var>> Params{};
+    std::list<std::shared_ptr<Var>> Params{};
     std::list<std::shared_ptr<Var>> Locals{};
     std::list<std::shared_ptr<AstNode>> Stmts{};
 

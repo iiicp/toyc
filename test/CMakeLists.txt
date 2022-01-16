@@ -10,4 +10,5 @@ add_executable(${PROJECT_NAME} main.cpp test.cpp
         ../src/Parser.cpp
         ../src/AstNode.cpp
         ../src/PrintVisitor.cpp
-        ../src/Diag.cpp)
+        ../src/Diag.cpp
+        ../src/Type.cpp)

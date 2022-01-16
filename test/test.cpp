@@ -154,7 +154,7 @@ TEST_CASE("C100_lexer5", "[lexer]") {
 
 TEST_CASE("C100_parser1", "[parser]")
 {
-    const char *code = "test(){ 5 + (1-  3)*4/2;a+2;}";
+    const char *code = "int test(){int a = 2; 5 + (1-  3)*4/2;a+2;}";
     Lexer lexer(code);
     lexer.GetNextToken();
     Parser parser(lexer);

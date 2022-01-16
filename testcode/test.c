@@ -1,26 +1,26 @@
-add(a,b,c,d,e,f) {
+int add(int a, int b, int c,int d,int e,int f) {
   return a+b+c+d+e+f;
 }
 
-ret() {
+int ret() {
   return 100;
 }
 
-sum(n) {
-  res = 0;
+int sum(int n) {
+  int res = 0, i = 0;
   for (i=0;i<=n;i=i+1) {
     res = res + i;
   }
   return res;
 }
 
-fib(n) {
+int fib(int n) {
     if (n <= 1) {
       return 1;
     }
     return fib(n-1) + fib(n-2);
 }
 
-prog() {
-  return fib(20);
+int prog() {
+  return fib(sum(4));
 }

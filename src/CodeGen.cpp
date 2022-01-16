@@ -45,8 +45,9 @@ void CodeGen::VisitorFunctionNode(FunctionNode *node)
   printf("\tmov %%rsp, %%rbp\n");
   printf("\tsub $%d, %%rsp\n", stackSize);
 
-  for (int i = 0; i < node->Params.size(); ++i) {
-    printf("\tmov %s, %d(%%rbp)\n", Reg64[i], node->Params[i]->Offset);
+  int i = 0;
+  for (auto &var : node->Params) {
+    printf("\tmov %s, %d(%%rbp)\n", Reg64[i++], var->Offset);
   }
 
   for (auto &S : node->Stmts) {

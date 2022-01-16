@@ -30,24 +30,18 @@ std::shared_ptr<AstNode> Parser::ParseFunction()
   Locals = &node->Locals;
   LocalsMap.clear();
 
-  node->FuncName = Lex.CurrentToken->Content;
-  Lex.ExpectToken(TokenKind::Identifier);
-  Lex.ExpectToken(TokenKind::LParent);
-  if (Lex.CurrentToken->Kind != TokenKind::RParent) {
-    auto tok = Lex.CurrentToken;
-    ParsePrimaryExpr();
-    node->Params.push_back(LocalsMap[tok->Content]);
+  auto baseType = ParseDeclarationSpec();
+  std::shared_ptr<Token> tok;
+  std::shared_ptr<Type> ty = ParseDeclarator(baseType, tok);
 
-    while (Lex.CurrentToken->Kind == TokenKind::Comma) {
-      Lex.GetNextToken();
+  node->FuncName = tok->Content;
 
-      auto tok = Lex.CurrentToken;
-      ParsePrimaryExpr();
-      node->Params.push_back(LocalsMap[tok->Content]);
-    }
+  auto funcTy = std::dynamic_pointer_cast<FunctionType>(ty);
+  ///node->Params.reserve(funcTy->Params.size());
+  for (int i = funcTy->Params.size()-1; i >= 0; i--) {
+     node->Params.push_front(MakeLocalVar(funcTy->Params[i]->Tok->Content, funcTy->Params[i]->Ty));
   }
-  Lex.ExpectToken(TokenKind::RParent);
-
+  node->Ty = funcTy;
   Lex.ExpectToken(TokenKind::LBrace);
   while (Lex.CurrentToken->Kind != TokenKind::RBrace) {
     node->Stmts.push_back(ParseStmt());
@@ -122,7 +116,7 @@ std::shared_ptr<AstNode> Parser::ParsePrimaryExpr()
         auto node = std::make_shared<VarExprNode>();
         std::shared_ptr<Var> obj = FindLocalVar(Lex.CurrentToken->Content);
         if (!obj) {
-          obj = MakeLocalVar(Lex.CurrentToken->Content);
+          DiagE(Lex.SourceCode, Lex.CurrentToken->Location, "undefined variable");
         }
         node->VarObj = obj;
         Lex.GetNextToken();
@@ -201,6 +195,33 @@ std::shared_ptr<AstNode> Parser::ParseStmt()
     Lex.ExpectToken(TokenKind::Semicolon);
     return node;
   }
+  else if (IsTypeName()) {
+    auto baseType = ParseDeclarationSpec();
+    auto node = std::make_shared<BlockStmtNode>();
+    int i = 0;
+    while (Lex.CurrentToken->Kind != TokenKind::Semicolon) {
+      if (i > 0) {
+        Lex.ExpectToken(TokenKind::Comma);
+      }
+      std::shared_ptr<Token> tok;
+      auto ty = ParseDeclarator(baseType, tok);
+      auto varObj = MakeLocalVar(tok->Content, ty);
+      i++;
+      if (Lex.CurrentToken->Kind != TokenKind::Assign) {
+        continue;
+      }
+      Lex.GetNextToken();
+      auto assign = std::make_shared<AssignExprNode>();
+      assign->Lhs = MakeVarNode(varObj);
+      assign->Rhs = ParseExpr();
+
+      auto exprStmt = std::make_shared<ExprStmtNode>();
+      exprStmt->Lhs = assign;
+      node->Stmts.push_back(exprStmt);
+    }
+    Lex.ExpectToken(TokenKind::Semicolon);
+    return node;
+  }
   else {
     auto node = std::make_shared<ExprStmtNode>();
     if (Lex.CurrentToken->Kind != TokenKind::Semicolon) {
@@ -274,9 +295,10 @@ std::shared_ptr<Var> Parser::FindLocalVar(std::string_view name) {
   return nullptr;
 }
 
-std::shared_ptr<Var> Parser::MakeLocalVar(std::string_view name) {
+std::shared_ptr<Var> Parser::MakeLocalVar(std::string_view name, std::shared_ptr<Type> ty) {
   auto obj = std::make_shared<Var>();
   obj->Name = name;
+  obj->Ty = ty;
   obj->Offset = 0;
   Locals->push_front(obj);
   LocalsMap[name] = obj;
@@ -299,4 +321,74 @@ std::shared_ptr<AstNode> Parser::ParseFuncCallNode() {
   Lex.ExpectToken(TokenKind::RParent);
   return node;
 }
+
+std::shared_ptr<Type> Parser::ParseDeclarationSpec() {
+  if (Lex.CurrentToken->Kind == TokenKind::Int) {
+    Lex.GetNextToken();
+    return Type::IntType;
+  }
+  DiagE(Lex.SourceCode, Lex.CurrentToken->Location, "type not support yet!");
+  return nullptr;
+}
+
+std::shared_ptr<Type> Parser::ParseDeclarator(std::shared_ptr<Type> baseType, std::shared_ptr<Token> &tok)
+{
+  auto ty = baseType;
+  while (Lex.CurrentToken->Kind == TokenKind::Mul) {
+    ty = std::make_shared<PointerType>(ty);
+    Lex.GetNextToken();
+  }
+
+  if (Lex.CurrentToken->Kind != TokenKind::Identifier) {
+    DiagE(Lex.SourceCode, Lex.CurrentToken->Location, "expected a variable name");
+  }
+  tok = Lex.CurrentToken;
+  Lex.GetNextToken();
+
+  ty = ParseTypeSuffix(ty);
+  return ty;
+}
+
+std::shared_ptr<Type> Parser::ParseTypeSuffix(std::shared_ptr<Type> baseType)
+{
+  if (Lex.CurrentToken->Kind == TokenKind::LParent) {
+    auto funcTy = std::make_shared<FunctionType>(baseType);
+    Lex.GetNextToken();
+    std::vector<std::shared_ptr<Param>> params;
+    if (Lex.CurrentToken->Kind != TokenKind::RParent) {
+      std::shared_ptr<Token> tok;
+      auto ty = ParseDeclarator(ParseDeclarationSpec(), tok);
+      auto pa = std::make_shared<Param>();
+      pa->Ty = ty;
+      pa->Tok = tok;
+      params.push_back(pa);
+      while (Lex.CurrentToken->Kind != TokenKind::RParent) {
+        Lex.ExpectToken(TokenKind::Comma);
+        auto ty = ParseDeclarator(ParseDeclarationSpec(), tok);
+        auto pa = std::make_shared<Param>();
+        pa->Ty = ty;
+        pa->Tok = tok;
+        params.push_back(pa);
+      }
+    }
+    funcTy->Params = params;
+    Lex.ExpectToken(TokenKind::RParent);
+    return funcTy;
+  }
+  else {
+    return baseType;
+  }
+}
+
+bool Parser::IsTypeName() {
+  return Lex.CurrentToken->Kind == TokenKind::Int;
+}
+
+std::shared_ptr<VarExprNode> Parser::MakeVarNode(std::shared_ptr<Var> var) {
+  auto node = std::make_shared<VarExprNode>();
+  node->VarObj = var;
+  node->Ty = var->Ty;
+  return node;
+}
+
 
