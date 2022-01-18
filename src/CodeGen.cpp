@@ -243,6 +243,11 @@ int CodeGen::AlignTo(int size, int align) {
   return (size + align - 1) / align * align;
 }
 
+void CodeGen::VisitorStmtExprNode(StmtExprNode *node) {
+  for (auto &s : node->Stmts)
+    s->Accept(this);
+}
+
 void CodeGen::VisitorFuncCallNode(FuncCallNode *node) {
   for(auto &arg : node->Args) {
     arg->Accept(this);

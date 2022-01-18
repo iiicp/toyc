@@ -39,6 +39,8 @@ namespace C100
       s->Accept(this);
   }
   void TypeVisitor::VisitorFuncCallNode(FuncCallNode *node) {
+    for (auto &arg : node->Args)
+      arg->Accept(this);
     node->Ty = Type::IntType;
   }
   void TypeVisitor::VisitorExprStmtNode(ExprStmtNode *node) {
@@ -74,6 +76,12 @@ namespace C100
   void TypeVisitor::VisitorReturnStmtNode(ReturnStmtNode *node)  {
     node->Lhs->Accept(this);
     node->Ty = node->Lhs->Ty;
+  }
+
+  void TypeVisitor::VisitorStmtExprNode(StmtExprNode *node) {
+    for (auto &s : node->Stmts) {
+      s->Accept(this);
+    }
   }
   void TypeVisitor::VisitorDeclarationStmtNode(DeclarationStmtNode *node) {
     for (auto &n : node->AssignNodes) {

@@ -81,4 +81,6 @@ MultiExpr            :=      PrimaryExpr
 PrimaryExpr          :=      Num
                      :=      (Expr)
                      :=      Identifier("("Args?")")?
+                     :=      "({"Stmt+"})"
+
 Args                 :=      AssignExpr(,AssignExpr)*

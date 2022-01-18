@@ -15,12 +15,14 @@ int sum(int n) {
 }
 
 int fib(int n) {
-    if (n <= 1) {
-      return 1;
-    }
-    return fib(n-1) + fib(n-2);
+  if (n <= 1) {
+    return 1;
+  }
+  return fib(n-1) + fib(n-2);
 }
 
-int prog() {
-  return fib(sum(4));
+int main() {
+  assert(89, fib(sum(({int i = 4, j;}))));
+  assert(17711, fib(sum(({int i = 4, j = 5; j * 2 - i;}))));
+  return 0;
 }

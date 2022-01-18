@@ -175,6 +175,13 @@ namespace C100
     void Accept(AstVisitor *visitor) override;
   };
 
+  class StmtExprNode : public AstNode
+  {
+  public:
+    std::list<std::shared_ptr<AstNode>> Stmts;
+    void Accept(AstVisitor *visitor) override;
+  };
+
   class AstVisitor
   {
   public:
@@ -190,6 +197,7 @@ namespace C100
     virtual void VisitorBlockStmtNode(BlockStmtNode *node)  = 0;
     virtual void VisitorReturnStmtNode(ReturnStmtNode *node)  = 0;
     virtual void VisitorDeclarationStmtNode(DeclarationStmtNode *node) = 0;
+    virtual void VisitorStmtExprNode(StmtExprNode *node) = 0;
     virtual void VisitorAssignExprNode(AssignExprNode *node) = 0;
     virtual void VisitorBinaryNode(BinaryNode *node) = 0;
     virtual void VisitorConstantNode(ConstantNode *node) = 0;

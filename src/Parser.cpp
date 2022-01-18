@@ -95,6 +95,22 @@ std::shared_ptr<AstNode> Parser::ParseMultiExpr()
 std::shared_ptr<AstNode> Parser::ParsePrimaryExpr()
 {
     if (Lex.CurrentToken->Kind == TokenKind::LParent) {
+        Lex.BeginPeekToken();
+        Lex.GetNextToken();
+        if (Lex.CurrentToken->Kind == TokenKind::LBrace) {
+          Lex.EndPeekToken();
+          Lex.ExpectToken(TokenKind::LParent);
+          Lex.ExpectToken(TokenKind::LBrace);
+          auto node = std::make_shared<StmtExprNode>();
+          while (Lex.CurrentToken->Kind != TokenKind::RBrace) {
+            node->Stmts.push_back(ParseStmt());
+          }
+          Lex.GetNextToken();
+          Lex.ExpectToken(TokenKind::RParent);
+          return node;
+        }
+        Lex.EndPeekToken();
+
         Lex.GetNextToken();
         auto node = ParseExpr();
         Lex.ExpectToken(TokenKind::RParent);
