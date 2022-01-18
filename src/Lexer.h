@@ -14,6 +14,7 @@
 #include <string_view>
 #include <memory>
 #include <cstdio>
+#include <cassert>
 
 namespace C100
 {

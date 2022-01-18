@@ -24,8 +24,8 @@ void CodeGen::VisitorFunctionNode(FunctionNode *node)
   printf("\t.text\n");
   CurrentFuncName = node->FuncName;
 #ifdef __linux__
-  printf("\t.globl %s\n", name.data());
-  printf("%s:\n",name.data());
+  printf("\t.globl %s\n", CurrentFuncName.data());
+  printf("%s:\n",CurrentFuncName.data());
 #else
   /// macos
   printf("\t.globl _%s\n",CurrentFuncName.data());
