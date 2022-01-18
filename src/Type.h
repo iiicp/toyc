@@ -99,6 +99,7 @@ namespace C100
     void VisitorForStmtNode(ForStmtNode *node) override;
     void VisitorBlockStmtNode(BlockStmtNode *node)  override;
     void VisitorReturnStmtNode(ReturnStmtNode *node)  override;
+    void VisitorDeclarationStmtNode(DeclarationStmtNode *node) override;
     void VisitorAssignExprNode(AssignExprNode *node) override;
     void VisitorBinaryNode(BinaryNode *node) override;
     void VisitorConstantNode(ConstantNode *node) override;

@@ -75,6 +75,11 @@ namespace C100
     node->Lhs->Accept(this);
     node->Ty = node->Lhs->Ty;
   }
+  void TypeVisitor::VisitorDeclarationStmtNode(DeclarationStmtNode *node) {
+    for (auto &n : node->AssignNodes) {
+        n->Accept(this);
+    }
+  }
   void TypeVisitor::VisitorAssignExprNode(AssignExprNode *node) {
     node->Lhs->Accept(this);
     node->Rhs->Accept(this);

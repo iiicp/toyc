@@ -15,7 +15,7 @@
 #include "Lexer.h"
 
 namespace C100 {
-  void DiagE(std::string_view code, SourceLocation loc, const char*fmt, ...);
+  void DiagLoc(SourceLocation loc, const char*fmt, ...);
 }
 
 #endif //C100_SRC_DIAG_H

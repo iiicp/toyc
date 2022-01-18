@@ -13,11 +13,18 @@
 #include <iostream>
 
 namespace C100 {
-  void DiagE(std::string_view code, SourceLocation loc, const char *fmt, ...) {
+  void DiagLoc(SourceLocation loc, const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
-    std::cerr << code << std::endl;
-    fprintf(stderr, "%*s^ ", loc.Col, "");
+    int len = fprintf(stderr, "%s:%d:%d ", loc.FilePath, loc.Line+1, loc.Col);
+    int i = loc.LineHead;
+    while (loc.Code[i]!='\n'){
+      fprintf(stderr, "%c", loc.Code[i]);
+      i++;
+    }
+    fprintf(stderr, "\n");
+    fprintf(stderr, "%*s", len+loc.Col,"");
+    fprintf(stderr, "^");
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");
     va_end(ap);

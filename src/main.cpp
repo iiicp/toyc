@@ -9,22 +9,11 @@ using namespace C100;
 int main(int argc, char *argv[]) {
 
   if (argc != 2) {
-    printf("please input: ./c100 code\n");
+    printf("please input: ./c100 filePath\n");
     return 0;
   }
 
-  FILE *fp = fopen(argv[1], "r");
-  if (fp == nullptr) {
-    printf("file open failed: %s\n", argv[1]);
-    return 0;
-  }
-
-  char buf[1024 * 10] = {0};
-  size_t len = fread(buf, 1, sizeof(buf), fp);
-  buf[len] = '\0';
-
-  const char *source = buf;
-  Lexer lex(source);
+  Lexer lex(argv[1]);
   lex.GetNextToken();
 
   Parser parser(lex);

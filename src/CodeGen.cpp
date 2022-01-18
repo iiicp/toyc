@@ -266,3 +266,8 @@ void CodeGen::VisitorReturnStmtNode(ReturnStmtNode *node) {
   printf("\tjmp .LReturn_%s\n",CurrentFuncName.data());
 }
 
+void CodeGen::VisitorDeclarationStmtNode(DeclarationStmtNode *node) {
+  for (auto &n : node->AssignNodes)
+    n->Accept(this);
+}
+

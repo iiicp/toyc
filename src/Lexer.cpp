@@ -35,10 +35,14 @@ void Lexer::GetNextToken() {
     GetNextChar();
   }
 
-  TokenKind kind;
   SourceLocation Location;
   Location.Line = Line;
   Location.Col = Cursor-1-LineHead;
+  Location.LineHead = LineHead;
+  Location.FilePath = CurrentFilePath;
+  Location.Code = SourceCode;
+
+  TokenKind kind;
   int value = 0;
   int startPos = Cursor - 1;
   if (CurChar == '\0')
@@ -99,7 +103,7 @@ void Lexer::GetNextToken() {
       GetNextChar();
       kind = TokenKind::PipeEqual;
     }else {
-      DiagE(SourceCode, Location, "current '%c' is illegal", CurChar);
+      DiagLoc(Location, "current '%c' is illegal", CurChar);
     }
     GetNextChar();
   }
@@ -151,7 +155,7 @@ void Lexer::GetNextToken() {
         kind = TokenKind::Int;
       }
     }else {
-      DiagE(SourceCode, Location, "current '%c' is illegal", CurChar);
+      DiagLoc(Location, "current '%c' is illegal", CurChar);
     }
   }
   CurrentToken = std::make_shared<Token>();
@@ -181,7 +185,7 @@ void Lexer::ExpectToken(TokenKind kind)
   if (CurrentToken->Kind == kind) {
     GetNextToken();
   }else {
-    DiagE(SourceCode, CurrentToken->Location, "'%s' expected", GetTokenSimpleSpelling(kind));
+    DiagLoc(CurrentToken->Location, "'%s' expected", GetTokenSimpleSpelling(kind));
   }
 }
 
@@ -214,17 +218,17 @@ char Lexer::PeekChar(int distance)
 
 
 void Lexer::BeginPeekToken() {
-  PeekPointCurChar = CurChar;
-  PeekPointCursor = Cursor;
-  PeekPointLine = Line;
-  PeekPointLineHead = LineHead;
-  PeekPointCurrentToken = CurrentToken;
+  PeekPt.CurChar = CurChar;
+  PeekPt.Cursor = Cursor;
+  PeekPt.Line = Line;
+  PeekPt.LineHead = LineHead;
+  PeekPt.CurrentToken = CurrentToken;
 }
 
 void Lexer::EndPeekToken() {
-  CurChar = PeekPointCurChar;
-  Cursor = PeekPointCursor;
-  Line = PeekPointLine;
-  LineHead = PeekPointLineHead;
-  CurrentToken = PeekPointCurrentToken;
+  CurChar = PeekPt.CurChar;
+  Cursor = PeekPt.Cursor;
+  Line = PeekPt.Line;
+  LineHead = PeekPt.LineHead;
+  CurrentToken = PeekPt.CurrentToken;
 }

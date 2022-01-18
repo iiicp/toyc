@@ -2,12 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(c100)
 set(CMAKE_CXX_STANDARD   17)
 set(CMAKE_BUILD_TYPE  Debug)
-add_executable(${PROJECT_NAME}
-        src/main.cpp
-        src/CodeGen.cpp
-        src/Lexer.cpp
-        src/Parser.cpp
-        src/AstNode.cpp
-        src/PrintVisitor.cpp
-        src/Diag.cpp
-        src/Type.cpp)
+file(GLOB_RECURSE SRCS "src/*.cpp" "src/*.c" "src/*.cc")
+file(GLOB_RECURSE DRIVER "src/driver.c")
+list(REMOVE_ITEM SRCS ${DRIVER})
+add_executable(${PROJECT_NAME} ${SRCS})

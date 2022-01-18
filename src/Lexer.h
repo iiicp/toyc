@@ -13,6 +13,7 @@
 
 #include <string_view>
 #include <memory>
+#include <cstdio>
 
 namespace C100
 {
@@ -49,6 +50,9 @@ namespace C100
 
   struct SourceLocation
   {
+    const char *FilePath;
+    std::string_view Code;
+    int LineHead;
     int Line;
     int Col;
   };
@@ -62,6 +66,16 @@ namespace C100
     std::string_view Content;
   };
 
+  class PeekPoint
+  {
+  public:
+    char CurChar;
+    int Cursor;
+    int Line;
+    int LineHead;
+    std::shared_ptr<Token> CurrentToken;
+  };
+
   class Lexer
   {
   private:
@@ -69,18 +83,29 @@ namespace C100
     int Cursor{0};
     int Line{0};
     int LineHead{0};
-
-    char PeekPointCurChar;
-    int PeekPointCursor;
-    int PeekPointLine;
-    int PeekPointLineHead;
-    std::shared_ptr<Token> PeekPointCurrentToken;
+    PeekPoint PeekPt;
+    std::string_view SourceCode;
+    char *CodeBuf{nullptr};
+    const char *CurrentFilePath{nullptr};
   public:
     std::shared_ptr<Token> CurrentToken;
-    std::string_view SourceCode;
   public:
-    Lexer(const char *code){
-      SourceCode = code;
+    Lexer(const char *filePath){
+      CurrentFilePath = filePath;
+      FILE *fp = fopen(filePath, "r");
+      if (fp) {
+        fseek(fp, 0, SEEK_END);
+        long fileSize = ftell(fp);
+        CodeBuf = (char *)malloc(fileSize + 1);
+        CodeBuf[fileSize] = '\0';
+        fseek(fp, 0, SEEK_SET);
+        fread(CodeBuf, fileSize, 1, fp);
+        fclose(fp);
+      }else {
+        printf("%s open failed\n", filePath);
+        assert(0);
+      }
+      SourceCode = CodeBuf;
     }
     void GetNextToken();
     void GetNextChar();

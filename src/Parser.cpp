@@ -116,13 +116,13 @@ std::shared_ptr<AstNode> Parser::ParsePrimaryExpr()
         auto node = std::make_shared<VarExprNode>();
         std::shared_ptr<Var> obj = FindLocalVar(Lex.CurrentToken->Content);
         if (!obj) {
-          DiagE(Lex.SourceCode, Lex.CurrentToken->Location, "undefined variable");
+          DiagLoc(Lex.CurrentToken->Location, "undefined variable");
         }
         node->VarObj = obj;
         Lex.GetNextToken();
         return node;
     }else {
-      DiagE(Lex.SourceCode, Lex.CurrentToken->Location,
+      DiagLoc(Lex.CurrentToken->Location,
             "not support");
     }
   return nullptr;
@@ -197,7 +197,7 @@ std::shared_ptr<AstNode> Parser::ParseStmt()
   }
   else if (IsTypeName()) {
     auto baseType = ParseDeclarationSpec();
-    auto node = std::make_shared<BlockStmtNode>();
+    auto node = std::make_shared<DeclarationStmtNode>();
     int i = 0;
     while (Lex.CurrentToken->Kind != TokenKind::Semicolon) {
       if (i > 0) {
@@ -215,9 +215,7 @@ std::shared_ptr<AstNode> Parser::ParseStmt()
       assign->Lhs = MakeVarNode(varObj);
       assign->Rhs = ParseExpr();
 
-      auto exprStmt = std::make_shared<ExprStmtNode>();
-      exprStmt->Lhs = assign;
-      node->Stmts.push_back(exprStmt);
+      node->AssignNodes.push_back(assign);
     }
     Lex.ExpectToken(TokenKind::Semicolon);
     return node;
@@ -327,7 +325,7 @@ std::shared_ptr<Type> Parser::ParseDeclarationSpec() {
     Lex.GetNextToken();
     return Type::IntType;
   }
-  DiagE(Lex.SourceCode, Lex.CurrentToken->Location, "type not support yet!");
+  DiagLoc(Lex.CurrentToken->Location, "type not support yet!");
   return nullptr;
 }
 
@@ -340,7 +338,7 @@ std::shared_ptr<Type> Parser::ParseDeclarator(std::shared_ptr<Type> baseType, st
   }
 
   if (Lex.CurrentToken->Kind != TokenKind::Identifier) {
-    DiagE(Lex.SourceCode, Lex.CurrentToken->Location, "expected a variable name");
+    DiagLoc(Lex.CurrentToken->Location, "expected a variable name");
   }
   tok = Lex.CurrentToken;
   Lex.GetNextToken();

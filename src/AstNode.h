@@ -122,6 +122,13 @@ namespace C100
     void Accept(AstVisitor *visitor) override;
   };
 
+  class DeclarationStmtNode : public AstNode
+  {
+  public:
+    std::list<std::shared_ptr<AssignExprNode>> AssignNodes;
+    void Accept(AstVisitor *visitor) override;
+  };
+
   enum class BinaryOperator
   {
     Add,
@@ -182,6 +189,7 @@ namespace C100
     virtual void VisitorForStmtNode(ForStmtNode *node) = 0;
     virtual void VisitorBlockStmtNode(BlockStmtNode *node)  = 0;
     virtual void VisitorReturnStmtNode(ReturnStmtNode *node)  = 0;
+    virtual void VisitorDeclarationStmtNode(DeclarationStmtNode *node) = 0;
     virtual void VisitorAssignExprNode(AssignExprNode *node) = 0;
     virtual void VisitorBinaryNode(BinaryNode *node) = 0;
     virtual void VisitorConstantNode(ConstantNode *node) = 0;
