@@ -20,10 +20,10 @@ namespace C100
 {
   enum class TokenKind
   {
-      Add,
-      Sub,
-      Mul,
-      Div,
+      Plus,
+      Minus,
+      Star,
+      Slash,
       Num,
       LParent,
       RParent,
@@ -33,6 +33,7 @@ namespace C100
       Semicolon,
       Assign,
       Comma,
+      Amp,
       Equal,
       PipeEqual,
       Greater,
@@ -121,6 +122,11 @@ namespace C100
     bool IsLetterOrDigit();
 
     char PeekChar(int distance);
+
+    void SkipWhiteSpace();
+    void SkipComment();
+
+    SourceLocation GetLocation();
 
     const char *GetTokenSimpleSpelling(TokenKind kind);
   };

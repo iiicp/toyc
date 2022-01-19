@@ -27,13 +27,7 @@ void Lexer::GetNextChar() {
 
 void Lexer::GetNextToken() {
   /// 1. skip write space
-  while (isspace(CurChar)) {
-    if (CurChar == '\n') {
-      Line++;
-      LineHead = Cursor;
-    }
-    GetNextChar();
-  }
+  SkipWhiteSpace();
 
   SourceLocation Location;
   Location.Line = Line;
@@ -50,19 +44,23 @@ void Lexer::GetNextToken() {
     kind = TokenKind::Eof;
   }
   else if (CurChar == '+'){
-    kind = TokenKind::Add;
+    kind = TokenKind::Plus;
     GetNextChar();
   }
   else if (CurChar == '-') {
-    kind = TokenKind::Sub;
+    kind = TokenKind::Minus;
     GetNextChar();
   }
   else if (CurChar == '*') {
-    kind = TokenKind::Mul;
+    kind = TokenKind::Star;
     GetNextChar();
   }
   else if (CurChar == '/') {
-    kind = TokenKind::Div;
+    kind = TokenKind::Slash;
+    GetNextChar();
+  }
+  else if (CurChar == '&') {
+    kind = TokenKind::Amp;
     GetNextChar();
   }
   else if (CurChar == '(') {
@@ -191,10 +189,10 @@ void Lexer::ExpectToken(TokenKind kind)
 
 const char  *Lexer::GetTokenSimpleSpelling(TokenKind kind){
   switch (kind) {
-  case TokenKind::Add: return "+";
-  case TokenKind::Sub: return "-";
-  case TokenKind::Mul: return "*";
-  case TokenKind::Div: return "/";
+  case TokenKind::Plus: return "+";
+  case TokenKind::Minus: return "-";
+  case TokenKind::Star: return "*";
+  case TokenKind::Slash: return "/";
   case TokenKind::LParent: return "(";
   case TokenKind::RParent: return ")";
   case TokenKind::Semicolon: return ";";
@@ -231,4 +229,45 @@ void Lexer::EndPeekToken() {
   Line = PeekPt.Line;
   LineHead = PeekPt.LineHead;
   CurrentToken = PeekPt.CurrentToken;
+}
+
+void Lexer::SkipWhiteSpace() {
+  while (isspace(CurChar)
+  || (CurChar == '/' && PeekChar(1) == '/')
+  || (CurChar == '/' && PeekChar(1) == '*')) {
+    if (CurChar == '/') {
+      SkipComment();
+      continue;
+    }else if (CurChar == '\n') {
+      Line++;
+      LineHead = Cursor;
+    }
+    GetNextChar();
+  }
+}
+
+void Lexer::SkipComment() {
+  if (CurChar == '/' && PeekChar(1) == '/') {
+    while (CurChar != '\n')
+      GetNextChar();
+  }else {
+    auto pos = SourceCode.find("*/", Cursor+1);
+    if (pos == std::string_view::npos) {
+      DiagLoc(GetLocation(), "(%d:%d) unclosed \"*/\"", Line, Cursor-1-LineHead);
+      assert(0);
+    }else {
+      CurChar = PeekChar((pos + 2) - (Cursor - 1));
+      Cursor = pos + 3;
+    }
+  }
+}
+
+SourceLocation Lexer::GetLocation() {
+  SourceLocation Location;
+  Location.Line = Line;
+  Location.Col = Cursor-1-LineHead;
+  Location.LineHead = LineHead;
+  Location.FilePath = CurrentFilePath;
+  Location.Code = SourceCode;
+  return Location;
 }

@@ -6,8 +6,8 @@ build step:
   3. cd cmake-build-debug 
   4. cmake ..
   5. make
-  6. ./c100 ../testcode/test.c > tmp.s
-  7. clang tmp.s ../src/driver.c -o tmp.out
+  6. ./c100 ../testcode/arith.c > tmp.s
+  7. clang tmp.s ../testcode/common.c -o tmp.out
   8. ./tmp.out
 
 day1: 支持编译5+1-3*4/2   
@@ -25,6 +25,10 @@ day9: 支持函数定义, 现在能编译如下语句
 day10: 支持函数调用，支持递归，能编译
 day11: 支持类型，函数类型，变量声明语句，能编译正式的c代码了
 day12: 调整诊断代码，支持如下的错误诊断. 拆分测试。
-../testcode/test.c:12:18     res = res + i;a;
-                                           ^undefined variable
+day13: 添加一元操作符的支持，支持注释操作. 能编译
+
+int main() {
+    int x=3;
+    return *&x;
+}
 

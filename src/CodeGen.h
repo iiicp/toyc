@@ -40,11 +40,14 @@ namespace C100 {
     void VisitorStmtExprNode(StmtExprNode *node) override;
     void VisitorDeclarationStmtNode(DeclarationStmtNode *node) override;
     void VisitorBinaryNode(BinaryNode *node) override;
+    void VisitorUnaryNode(UnaryNode *node) override;
     void VisitorConstantNode(ConstantNode *node) override;
     void VisitorVarExprNode(VarExprNode *node)override;
 
     void Push();
     void Pop(const char *reg);
+
+    void GenAddr(AstNode *node);
 
     int AlignTo(int size, int align);
   };

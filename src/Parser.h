@@ -36,6 +36,7 @@ namespace C100
     std::shared_ptr<AstNode> ParseRelationalExpr();
     std::shared_ptr<AstNode> ParseAddExpr();
     std::shared_ptr<AstNode> ParseMultiExpr();
+    std::shared_ptr<AstNode> ParseUnaryExpr();
     std::shared_ptr<AstNode> ParsePrimaryExpr();
 
     bool IsTypeName();

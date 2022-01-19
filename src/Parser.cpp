@@ -59,10 +59,10 @@ std::shared_ptr<AstNode> Parser::ParseExpr()
 std::shared_ptr<AstNode> Parser::ParseAddExpr()
 {
   std::shared_ptr<AstNode> left = ParseMultiExpr();
-  while (Lex.CurrentToken->Kind == TokenKind::Add
-         || Lex.CurrentToken->Kind == TokenKind::Sub) {
+  while (Lex.CurrentToken->Kind == TokenKind::Plus
+         || Lex.CurrentToken->Kind == TokenKind::Minus) {
     BinaryOperator anOperator = BinaryOperator::Add;
-    if (Lex.CurrentToken->Kind == TokenKind::Sub)
+    if (Lex.CurrentToken->Kind == TokenKind::Minus)
       anOperator = BinaryOperator::Sub;
     Lex.GetNextToken();
     auto node = std::make_shared<BinaryNode>();
@@ -76,20 +76,60 @@ std::shared_ptr<AstNode> Parser::ParseAddExpr()
 
 std::shared_ptr<AstNode> Parser::ParseMultiExpr()
 {
-  std::shared_ptr<AstNode> left = ParsePrimaryExpr();
-  while (Lex.CurrentToken->Kind == TokenKind::Mul
-         || Lex.CurrentToken->Kind == TokenKind::Div) {
+  std::shared_ptr<AstNode> left = ParseUnaryExpr();
+  while (Lex.CurrentToken->Kind == TokenKind::Star
+         || Lex.CurrentToken->Kind == TokenKind::Slash) {
     BinaryOperator anOperator = BinaryOperator::Mul;
-    if (Lex.CurrentToken->Kind == TokenKind::Div)
+    if (Lex.CurrentToken->Kind == TokenKind::Slash)
       anOperator = BinaryOperator::Div;
     Lex.GetNextToken();
     auto node = std::make_shared<BinaryNode>();
     node->BinOp = anOperator;
     node->Lhs = left;
-    node->Rhs = ParsePrimaryExpr();
+    node->Rhs = ParseUnaryExpr();
     left = node;
   }
   return left;
+}
+
+std::shared_ptr<AstNode> Parser::ParseUnaryExpr() {
+  if (Lex.CurrentToken->Kind == TokenKind::Plus || Lex.CurrentToken->Kind == TokenKind::Minus
+  || Lex.CurrentToken->Kind == TokenKind::Star || Lex.CurrentToken->Kind == TokenKind::Amp) {
+    switch (Lex.CurrentToken->Kind) {
+    case TokenKind::Plus: {
+      auto node = std::make_shared<UnaryNode>();
+      node->Uop = UnaryOperator::Plus;
+      Lex.GetNextToken();
+      node->Lhs = ParseUnaryExpr();
+      return node;
+    }
+    case TokenKind::Minus: {
+      auto node = std::make_shared<UnaryNode>();
+      node->Uop = UnaryOperator::Minus;
+      Lex.GetNextToken();
+      node->Lhs = ParseUnaryExpr();
+      return node;
+    }
+    case TokenKind::Star: {
+      auto node = std::make_shared<UnaryNode>();
+      node->Uop = UnaryOperator::Deref;
+      Lex.GetNextToken();
+      node->Lhs = ParseUnaryExpr();
+      return node;
+    }
+    case TokenKind::Amp: {
+      auto node = std::make_shared<UnaryNode>();
+      node->Uop = UnaryOperator::Amp;
+      Lex.GetNextToken();
+      node->Lhs = ParseUnaryExpr();
+      return node;
+      }
+    default:
+      assert(0);
+      break;
+    }
+  }
+  return ParsePrimaryExpr();
 }
 
 std::shared_ptr<AstNode> Parser::ParsePrimaryExpr()
@@ -348,7 +388,7 @@ std::shared_ptr<Type> Parser::ParseDeclarationSpec() {
 std::shared_ptr<Type> Parser::ParseDeclarator(std::shared_ptr<Type> baseType, std::shared_ptr<Token> &tok)
 {
   auto ty = baseType;
-  while (Lex.CurrentToken->Kind == TokenKind::Mul) {
+  while (Lex.CurrentToken->Kind == TokenKind::Star) {
     ty = std::make_shared<PointerType>(ty);
     Lex.GetNextToken();
   }
@@ -404,5 +444,7 @@ std::shared_ptr<VarExprNode> Parser::MakeVarNode(std::shared_ptr<Var> var) {
   node->Ty = var->Ty;
   return node;
 }
+
+
 
 

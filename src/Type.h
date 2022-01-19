@@ -80,9 +80,8 @@ namespace C100
 
   class PointerType : public Type
   {
-  private:
-    std::shared_ptr<Type> Base;
   public:
+    std::shared_ptr<Type> Base;
     PointerType(std::shared_ptr<Type> Base) : Type(TypeClass::PointerType, 8, 8) {}
   };
 
@@ -103,6 +102,7 @@ namespace C100
     void VisitorDeclarationStmtNode(DeclarationStmtNode *node) override;
     void VisitorAssignExprNode(AssignExprNode *node) override;
     void VisitorBinaryNode(BinaryNode *node) override;
+    void VisitorUnaryNode(UnaryNode *node) override;
     void VisitorConstantNode(ConstantNode *node) override;
     void VisitorVarExprNode(VarExprNode *node) override;
   };

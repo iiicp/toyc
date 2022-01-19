@@ -152,6 +152,21 @@ namespace C100
     void Accept(AstVisitor *visitor) override;
   };
 
+  enum class UnaryOperator
+  {
+    Plus,
+    Minus,
+    Deref,
+    Amp
+  };
+  class UnaryNode : public AstNode
+  {
+  public:
+    UnaryOperator Uop;
+    std::shared_ptr<AstNode> Lhs;
+    void Accept(AstVisitor *visitor) override;
+  };
+
   class ConstantNode : public AstNode
   {
   public:
@@ -200,6 +215,7 @@ namespace C100
     virtual void VisitorStmtExprNode(StmtExprNode *node) = 0;
     virtual void VisitorAssignExprNode(AssignExprNode *node) = 0;
     virtual void VisitorBinaryNode(BinaryNode *node) = 0;
+    virtual void VisitorUnaryNode(UnaryNode *node) = 0;
     virtual void VisitorConstantNode(ConstantNode *node) = 0;
     virtual void VisitorVarExprNode(VarExprNode *node) = 0;
   };

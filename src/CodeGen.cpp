@@ -10,6 +10,7 @@
 
 #include "CodeGen.h"
 #include <cassert>
+#include "Diag.h"
 
 using namespace C100;
 
@@ -152,10 +153,7 @@ void CodeGen::VisitorExprStmtNode(ExprStmtNode *node) {
 }
 
 void CodeGen::VisitorAssignExprNode(AssignExprNode *node) {
-
-  auto varNode = std::dynamic_pointer_cast<VarExprNode>(node->Lhs);
-  assert(varNode != nullptr);
-  printf("\tlea %d(%%rbp), %%rax\n", varNode->VarObj->Offset);
+  GenAddr(node->Lhs.get());
   Push();
   node->Rhs->Accept(this);
   Pop("%rdi");
@@ -274,5 +272,46 @@ void CodeGen::VisitorReturnStmtNode(ReturnStmtNode *node) {
 void CodeGen::VisitorDeclarationStmtNode(DeclarationStmtNode *node) {
   for (auto &n : node->AssignNodes)
     n->Accept(this);
+}
+
+void CodeGen::VisitorUnaryNode(UnaryNode *node) {
+  switch (node->Uop) {
+  case UnaryOperator::Plus: {
+    node->Lhs->Accept(this);
+    break;
+  }
+  case UnaryOperator::Minus: {
+    node->Lhs->Accept(this);
+    printf("\tneg %%rax\n");
+    break;
+  }
+  case UnaryOperator::Deref: {
+    GenAddr(node);
+    printf("\tmov (%%rax), %%rax\n");
+    break;
+  }
+  case UnaryOperator::Amp: {
+    GenAddr(node->Lhs.get());
+    break;
+  }
+  default:
+    break;
+  }
+}
+
+void CodeGen::GenAddr(AstNode *node) {
+  if (auto var = dynamic_cast<VarExprNode *>(node)) {
+    printf("\tlea %d(%%rbp), %%rax\n", var->VarObj->Offset);
+  }else if (auto unaryNode = dynamic_cast<UnaryNode *>(node)) {
+    if (unaryNode->Uop == UnaryOperator::Deref) {
+      unaryNode->Lhs->Accept(this);
+    }else {
+      printf("unaryNode must be deref!!\n");
+      assert(0);
+    }
+  }else {
+    printf("not a lvalue\n");
+    assert(0);
+  }
 }
 

@@ -116,6 +116,30 @@ namespace C100
       break;
     }
   }
+
+  void TypeVisitor::VisitorUnaryNode(UnaryNode *node) {
+    switch (node->Uop) {
+    case UnaryOperator::Plus:
+    case UnaryOperator::Minus: {
+      node->Ty = node->Lhs->Ty;
+      break;
+    }
+    case UnaryOperator::Deref: {
+      if (node->Lhs->Ty->IsPointerType()) {
+        node->Ty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty)->Base;
+      } else {
+        printf("invalid deref operation!");
+        assert(0);
+      }
+      break;
+    }
+    case UnaryOperator::Amp: {
+      node->Ty = std::make_shared<PointerType>(node->Lhs->Ty);
+      break;
+    }
+    }
+  }
+
   void TypeVisitor::VisitorConstantNode(ConstantNode *node) {
     node->Ty = Type::IntType;
   }
