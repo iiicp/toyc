@@ -44,6 +44,8 @@ namespace C100
     bool IsIntegerType() const;
     bool IsPointerType() const;
     bool IsFunctionType() const;
+    int GetSize() const;
+    int GetAlign() const;
   };
 
   class BuildInType : public Type
@@ -103,6 +105,7 @@ namespace C100
     void VisitorStmtExprNode(StmtExprNode *node) override;
     void VisitorDeclarationStmtNode(DeclarationStmtNode *node) override;
     void VisitorAssignExprNode(AssignExprNode *node) override;
+    void VisitorSizeofExprNode(SizeofExprNode *node) override;
     void VisitorBinaryNode(BinaryNode *node) override;
     void VisitorUnaryNode(UnaryNode *node) override;
     void VisitorConstantNode(ConstantNode *node) override;

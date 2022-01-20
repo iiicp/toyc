@@ -31,6 +31,7 @@ namespace C100 {
     void VisitorFuncCallNode(FuncCallNode *node) override;
     void VisitorExprStmtNode(ExprStmtNode *node)override;
     void VisitorAssignExprNode(AssignExprNode *node)override;
+    void VisitorSizeofExprNode(SizeofExprNode *node) override;
     void VisitorIfStmtNode(IfStmtNode *node) override;
     void VisitorWhileStmtNode(WhileStmtNode *node) override;
     void VisitorDoWhileStmtNode(DoWhileStmtNode *node) override;

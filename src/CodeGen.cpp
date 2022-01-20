@@ -11,6 +11,7 @@
 #include "CodeGen.h"
 #include <cassert>
 #include "Diag.h"
+#include "Type.h"
 
 using namespace C100;
 
@@ -82,6 +83,26 @@ void CodeGen::VisitorBinaryNode(BinaryNode *node)
     printf("\tcqo\n");
     printf("\tidiv %%rdi\n");
     break;
+  case BinaryOperator::PtrAdd: {
+     auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty);
+     printf("\timul $%d, %%rdi\n", pty->GetSize());
+     printf("\tadd %%rdi, %%rax\n");
+     break;
+  }
+  case BinaryOperator::PtrSub: {
+    auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty);
+    printf("\timul $%d, %%rdi\n", pty->GetSize());
+    printf("\tsub %%rdi, %%rax\n");
+    break;
+  }
+  case BinaryOperator::PtrDiff: {
+    auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty);
+    printf("\tsub %%rdi, %%rax\n");
+    printf("\tmov $%d, %%rdi\n", pty->GetSize());
+    printf("\tcqo\n");
+    printf("\tidiv %%rdi\n");
+    break;
+  }
   case BinaryOperator::Equal:
   {
     printf("\tcmp %%rdi, %%rax\n");
@@ -311,5 +332,9 @@ void CodeGen::GenAddr(AstNode *node) {
   }else {
     DiagLoc(node->Tok->Location, "not a lvalue");
   }
+}
+
+void CodeGen::VisitorSizeofExprNode(SizeofExprNode *node) {
+  printf("\tmov $%d, %%rax\n", node->Ty->GetSize());
 }
 

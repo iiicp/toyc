@@ -151,6 +151,8 @@ void Lexer::GetNextToken() {
         kind = TokenKind::Return;
       }else if (content == "int") {
         kind = TokenKind::Int;
+      }else if (content == "sizeof") {
+        kind = TokenKind::SizeOf;
       }
     }else {
       DiagLoc(Location, "current '%c' is illegal", CurChar);
@@ -223,6 +225,7 @@ const char  *Lexer::GetTokenSimpleSpelling(TokenKind kind){
   case TokenKind::For:return "for";
   case TokenKind::Return:return "return";
   case TokenKind::Int:return "int";
+  case TokenKind::SizeOf:return "sizeof";
   case TokenKind::Eof: return "eof";
   default:
     break;

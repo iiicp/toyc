@@ -60,14 +60,46 @@ std::shared_ptr<AstNode> Parser::ParseAddExpr()
   std::shared_ptr<AstNode> left = ParseMultiExpr();
   while (Lex.CurrentToken->Kind == TokenKind::Plus
          || Lex.CurrentToken->Kind == TokenKind::Minus) {
-    BinaryOperator anOperator = BinaryOperator::Add;
-    if (Lex.CurrentToken->Kind == TokenKind::Minus)
-      anOperator = BinaryOperator::Sub;
-    auto node = std::make_shared<BinaryNode>(Lex.CurrentToken);
+
+    auto tok = Lex.CurrentToken;
     Lex.GetNextToken();
-    node->BinOp = anOperator;
+    auto right = ParseMultiExpr();
+
+    left->Accept(TypeVisitor::Visitor());
+    right->Accept(TypeVisitor::Visitor());
+
+    BinaryOperator bop;
+
+    if (tok->Kind == TokenKind::Plus) {
+      if (left->Ty->IsPointerType() && right->Ty->IsIntegerType()) {
+        bop = BinaryOperator::PtrAdd;
+      } else if (left->Ty->IsIntegerType() && right->Ty->IsPointerType()) {
+        auto tmp = left;
+        left = right;
+        right = tmp;
+        bop = BinaryOperator::PtrAdd;
+      } else if (left->Ty->IsIntegerType() && right->Ty->IsIntegerType()) {
+        bop = BinaryOperator::Add;
+      } else {
+        DiagLoc(tok->Location, "invalid add operation");
+      }
+    }else {
+      if (left->Ty->IsPointerType() && right->Ty->IsIntegerType()) {
+        bop = BinaryOperator::PtrSub;
+      } else if (left->Ty->IsIntegerType() && right->Ty->IsIntegerType()) {
+        bop = BinaryOperator::Sub;
+      } else if (left->Ty->IsPointerType() && right->Ty->IsPointerType()) {
+        bop = BinaryOperator::PtrDiff;
+      }
+      else {
+        DiagLoc(tok->Location, "invalid sub operation");
+      }
+    }
+
+    auto node = std::make_shared<BinaryNode>(tok);
     node->Lhs = left;
-    node->Rhs = ParseMultiExpr();
+    node->BinOp = bop;
+    node->Rhs = right;
     left = node;
   }
   return left;
@@ -171,7 +203,13 @@ std::shared_ptr<AstNode> Parser::ParsePrimaryExpr()
         node->VarObj = obj;
         Lex.GetNextToken();
         return node;
-    }else {
+    }else if (Lex.CurrentToken->Kind == TokenKind::SizeOf) {
+        auto node = std::make_shared<SizeofExprNode>(Lex.CurrentToken);
+        Lex.SkipToken(TokenKind::SizeOf);
+        node->Lhs = ParseUnaryExpr();
+        return node;
+    }
+    else {
       DiagLoc(Lex.CurrentToken->Location,
             "not support");
     }

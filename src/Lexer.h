@@ -45,6 +45,7 @@ namespace C100
     For,
     Return,
     Int,
+    SizeOf,
     Num,
     Identifier,
     Eof

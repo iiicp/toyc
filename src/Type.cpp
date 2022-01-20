@@ -31,6 +31,14 @@ namespace C100
     return TC == TypeClass::FunctionType;
   }
 
+  int Type::GetSize() const {
+    return Size;
+  }
+
+  int Type::GetAlign() const {
+    return Align;
+  }
+
   void TypeVisitor::VisitorProgramNode(ProgramNode *node) {
     for (auto &f : node->Funcs)
       f->Accept(this);
@@ -94,6 +102,12 @@ namespace C100
     node->Rhs->Accept(this);
     node->Ty = node->Lhs->Ty;
   }
+
+  void TypeVisitor::VisitorSizeofExprNode(SizeofExprNode *node) {
+    node->Lhs->Accept(this);
+    node->Ty = node->Lhs->Ty;
+  }
+
   void TypeVisitor::VisitorBinaryNode(BinaryNode *node) {
     node->Lhs->Accept(this);
     node->Rhs->Accept(this);
@@ -102,6 +116,8 @@ namespace C100
     case BinaryOperator::Sub:
     case BinaryOperator::Mul:
     case BinaryOperator::Div:
+    case BinaryOperator::PtrAdd:
+    case BinaryOperator::PtrSub:
       node->Ty = node->Lhs->Ty;
       break;
     case BinaryOperator::Equal:
@@ -110,6 +126,7 @@ namespace C100
     case BinaryOperator::GreaterEqual:
     case BinaryOperator::Lesser:
     case BinaryOperator::LesserEqual:
+    case BinaryOperator::PtrDiff:
       node->Ty = Type::IntType;
       break;
     default:

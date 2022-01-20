@@ -84,5 +84,5 @@ PrimaryExpr          :=      Num
                      :=      (Expr)
                      :=      Identifier("("Args?")")?
                      :=      "({"Stmt+"})"
-
+                     :=      sizeof UnaryExpr
 Args                 :=      AssignExpr(,AssignExpr)*

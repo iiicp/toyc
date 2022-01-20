@@ -130,6 +130,14 @@ namespace C100
     void Accept(AstVisitor *visitor) override;
   };
 
+  class SizeofExprNode : public AstNode
+  {
+  public:
+    std::shared_ptr<AstNode> Lhs{nullptr};
+    SizeofExprNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
+    void Accept(AstVisitor *visitor) override;
+  };
+
   class DeclarationStmtNode : public AstNode
   {
   public:
@@ -141,7 +149,10 @@ namespace C100
   enum class BinaryOperator
   {
     Add,
+    PtrAdd,
     Sub,
+    PtrSub,
+    PtrDiff,
     Mul,
     Div,
     Equal,
@@ -228,6 +239,7 @@ namespace C100
     virtual void VisitorDeclarationStmtNode(DeclarationStmtNode *node) = 0;
     virtual void VisitorStmtExprNode(StmtExprNode *node) = 0;
     virtual void VisitorAssignExprNode(AssignExprNode *node) = 0;
+    virtual void VisitorSizeofExprNode(SizeofExprNode *node) = 0;
     virtual void VisitorBinaryNode(BinaryNode *node) = 0;
     virtual void VisitorUnaryNode(UnaryNode *node) = 0;
     virtual void VisitorConstantNode(ConstantNode *node) = 0;
