@@ -187,6 +187,15 @@ void Lexer::ExpectToken(TokenKind kind)
   }
 }
 
+void Lexer::SkipToken(TokenKind kind)
+{
+  if (CurrentToken->Kind == kind) {
+    GetNextToken();
+  }else {
+    DiagLoc(CurrentToken->Location, "'%s' skipped", GetTokenSimpleSpelling(kind));
+  }
+}
+
 const char  *Lexer::GetTokenSimpleSpelling(TokenKind kind){
   switch (kind) {
   case TokenKind::Plus: return "+";
@@ -195,8 +204,25 @@ const char  *Lexer::GetTokenSimpleSpelling(TokenKind kind){
   case TokenKind::Slash: return "/";
   case TokenKind::LParent: return "(";
   case TokenKind::RParent: return ")";
+  case TokenKind::LBrace: return "{";
+  case TokenKind::RBrace: return "}";
   case TokenKind::Semicolon: return ";";
   case TokenKind::Assign: return "=";
+  case TokenKind::Comma: return ",";
+  case TokenKind::Amp: return "&";
+  case TokenKind::Equal:return "==";
+  case TokenKind::PipeEqual:return "!=";
+  case TokenKind::Greater:return ">";
+  case TokenKind::GreaterEqual:return ">=";
+  case TokenKind::Lesser:return "<";
+  case TokenKind::LesserEqual:return "<=";
+  case TokenKind::If:return "if";
+  case TokenKind::Else:return "else";
+  case TokenKind::While:return "while";
+  case TokenKind::Do: return "do";
+  case TokenKind::For:return "for";
+  case TokenKind::Return:return "return";
+  case TokenKind::Int:return "int";
   case TokenKind::Eof: return "eof";
   default:
     break;
@@ -253,7 +279,7 @@ void Lexer::SkipComment() {
   }else {
     auto pos = SourceCode.find("*/", Cursor+1);
     if (pos == std::string_view::npos) {
-      DiagLoc(GetLocation(), "(%d:%d) unclosed \"*/\"", Line, Cursor-1-LineHead);
+      DiagLoc(GetLocation(), "unclosed \"*/\"");
       assert(0);
     }else {
       CurChar = PeekChar((pos + 2) - (Cursor - 1));

@@ -9,6 +9,7 @@
 ***********************************/
 
 #include "Type.h"
+#include "Diag.h"
 
 namespace C100
 {
@@ -118,17 +119,18 @@ namespace C100
   }
 
   void TypeVisitor::VisitorUnaryNode(UnaryNode *node) {
+    node->Lhs->Accept(this);
     switch (node->Uop) {
     case UnaryOperator::Plus:
     case UnaryOperator::Minus: {
       node->Ty = node->Lhs->Ty;
       break;
     }
-    case UnaryOperator::Deref: {
+    case UnaryOperator::Star: {
       if (node->Lhs->Ty->IsPointerType()) {
         node->Ty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty)->Base;
       } else {
-        printf("invalid deref operation!");
+        DiagLoc(node->Tok->Location, "invalid dereference operation");
         assert(0);
       }
       break;
@@ -145,5 +147,10 @@ namespace C100
   }
   void TypeVisitor::VisitorVarExprNode(VarExprNode *node) {
     node->Ty = node->VarObj->Ty;
+  }
+
+  TypeVisitor *TypeVisitor::Visitor() {
+    static TypeVisitor visitor;
+    return &visitor;
   }
 }

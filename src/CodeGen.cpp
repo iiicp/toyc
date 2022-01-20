@@ -256,7 +256,7 @@ void CodeGen::VisitorFuncCallNode(FuncCallNode *node) {
   }
 
   std::string FuncName(node->FuncName);
-
+  printf("\tmov $0, %%rax\n");
 #ifdef __linux__
   printf("\tcall %s\n",FuncName.data());
 #else
@@ -285,7 +285,7 @@ void CodeGen::VisitorUnaryNode(UnaryNode *node) {
     printf("\tneg %%rax\n");
     break;
   }
-  case UnaryOperator::Deref: {
+  case UnaryOperator::Star: {
     GenAddr(node);
     printf("\tmov (%%rax), %%rax\n");
     break;
@@ -303,15 +303,13 @@ void CodeGen::GenAddr(AstNode *node) {
   if (auto var = dynamic_cast<VarExprNode *>(node)) {
     printf("\tlea %d(%%rbp), %%rax\n", var->VarObj->Offset);
   }else if (auto unaryNode = dynamic_cast<UnaryNode *>(node)) {
-    if (unaryNode->Uop == UnaryOperator::Deref) {
+    if (unaryNode->Uop == UnaryOperator::Star) {
       unaryNode->Lhs->Accept(this);
     }else {
-      printf("unaryNode must be deref!!\n");
-      assert(0);
+      DiagLoc(node->Tok->Location,"unaryNode must be dereference operation");
     }
   }else {
-    printf("not a lvalue\n");
-    assert(0);
+    DiagLoc(node->Tok->Location, "not a lvalue");
   }
 }
 

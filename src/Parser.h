@@ -47,7 +47,7 @@ namespace C100
     std::shared_ptr<AstNode> ParseFuncCallNode();
     std::shared_ptr<Var> FindLocalVar(std::string_view name);
     std::shared_ptr<Var> MakeLocalVar(std::string_view name, std::shared_ptr<Type> ty);
-    std::shared_ptr<VarExprNode> MakeVarNode(std::shared_ptr<Var> var);
+    std::shared_ptr<VarExprNode> MakeVarNode(std::shared_ptr<Var> var, std::shared_ptr<Token> tok);
   };
 }
 

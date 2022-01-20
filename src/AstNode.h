@@ -20,12 +20,15 @@ namespace C100
 {
   class AstVisitor;
   class Type;
+  class Token;
   class AstNode
   {
   public:
     std::shared_ptr<Type> Ty;
+    std::shared_ptr<Token> Tok;
     virtual ~AstNode() {}
-    virtual void Accept(AstVisitor *visitor) {};
+    AstNode(std::shared_ptr<Token> tok) : Tok(tok) {}
+    virtual void Accept(AstVisitor *visitor) = 0;
   };
 
   class Var
@@ -40,6 +43,7 @@ namespace C100
   {
   public:
     std::list<std::shared_ptr<AstNode>> Funcs;
+    ProgramNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -50,7 +54,7 @@ namespace C100
     std::list<std::shared_ptr<Var>> Params{};
     std::list<std::shared_ptr<Var>> Locals{};
     std::list<std::shared_ptr<AstNode>> Stmts{};
-
+    FunctionNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -58,6 +62,7 @@ namespace C100
   {
   public:
     std::shared_ptr<AstNode> Lhs{nullptr};
+    ExprStmtNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -67,7 +72,7 @@ namespace C100
     std::shared_ptr<AstNode> Cond{nullptr};
     std::shared_ptr<AstNode> Then{nullptr};
     std::shared_ptr<AstNode> Else{nullptr};
-
+    IfStmtNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -76,7 +81,7 @@ namespace C100
   public:
     std::shared_ptr<AstNode> Cond{nullptr};
     std::shared_ptr<AstNode> Then{nullptr};
-
+    WhileStmtNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -85,7 +90,7 @@ namespace C100
   public:
     std::shared_ptr<AstNode> Stmt{nullptr};
     std::shared_ptr<AstNode> Cond{nullptr};
-
+    DoWhileStmtNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -96,7 +101,7 @@ namespace C100
     std::shared_ptr<AstNode> Cond{nullptr};
     std::shared_ptr<AstNode> Inc{nullptr};
     std::shared_ptr<AstNode> Stmt{nullptr};
-
+    ForStmtNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -104,21 +109,24 @@ namespace C100
   {
   public:
     std::list<std::shared_ptr<AstNode>> Stmts;
+    BlockStmtNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
   class ReturnStmtNode : public AstNode
   {
   public:
-    std::shared_ptr<AstNode> Lhs;
+    std::shared_ptr<AstNode> Lhs{nullptr};
+    ReturnStmtNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
   class AssignExprNode : public AstNode
   {
   public:
-    std::shared_ptr<AstNode> Lhs;
-    std::shared_ptr<AstNode> Rhs;
+    std::shared_ptr<AstNode> Lhs{nullptr};
+    std::shared_ptr<AstNode> Rhs{nullptr};
+    AssignExprNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -126,6 +134,7 @@ namespace C100
   {
   public:
     std::list<std::shared_ptr<AssignExprNode>> AssignNodes;
+    DeclarationStmtNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -147,8 +156,9 @@ namespace C100
   {
   public:
     BinaryOperator BinOp;
-    std::shared_ptr<AstNode> Lhs;
-    std::shared_ptr<AstNode> Rhs;
+    std::shared_ptr<AstNode> Lhs{nullptr};
+    std::shared_ptr<AstNode> Rhs{nullptr};
+    BinaryNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -156,14 +166,15 @@ namespace C100
   {
     Plus,
     Minus,
-    Deref,
+    Star,
     Amp
   };
   class UnaryNode : public AstNode
   {
   public:
     UnaryOperator Uop;
-    std::shared_ptr<AstNode> Lhs;
+    std::shared_ptr<AstNode> Lhs{nullptr};
+    UnaryNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -171,6 +182,7 @@ namespace C100
   {
   public:
     int Value;
+    ConstantNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -178,6 +190,7 @@ namespace C100
   {
   public:
     std::shared_ptr<Var> VarObj;
+    VarExprNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -186,7 +199,7 @@ namespace C100
   public:
     std::string_view FuncName;
     std::vector<std::shared_ptr<AstNode>> Args;
-
+    FuncCallNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -194,6 +207,7 @@ namespace C100
   {
   public:
     std::list<std::shared_ptr<AstNode>> Stmts;
+    StmtExprNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 

@@ -74,15 +74,17 @@ namespace C100
   private:
     std::shared_ptr<Type> ReturnType;
   public:
-    std::vector<std::shared_ptr<Param>> Params;
-    FunctionType(std::shared_ptr<Type> returnTy) : Type(TypeClass::FunctionType, 8, 8) {}
+    std::list<std::shared_ptr<Param>> Params;
+    FunctionType(std::shared_ptr<Type> returnTy)
+        : Type(TypeClass::FunctionType, 8, 8), ReturnType(returnTy) {}
   };
 
   class PointerType : public Type
   {
   public:
     std::shared_ptr<Type> Base;
-    PointerType(std::shared_ptr<Type> Base) : Type(TypeClass::PointerType, 8, 8) {}
+    PointerType(std::shared_ptr<Type> base)
+        : Type(TypeClass::PointerType, 8, 8), Base(base) {}
   };
 
   class TypeVisitor : public AstVisitor
@@ -105,6 +107,8 @@ namespace C100
     void VisitorUnaryNode(UnaryNode *node) override;
     void VisitorConstantNode(ConstantNode *node) override;
     void VisitorVarExprNode(VarExprNode *node) override;
+
+    static TypeVisitor *Visitor();
   };
 }
 

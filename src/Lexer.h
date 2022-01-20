@@ -20,34 +20,34 @@ namespace C100
 {
   enum class TokenKind
   {
-      Plus,
-      Minus,
-      Star,
-      Slash,
-      Num,
-      LParent,
-      RParent,
-      LBrace,
-      RBrace,
-      Identifier,
-      Semicolon,
-      Assign,
-      Comma,
-      Amp,
-      Equal,
-      PipeEqual,
-      Greater,
-      GreaterEqual,
-      Lesser,
-      LesserEqual,
-      If,
-      Else,
-      While,
-      Do,
-      For,
-      Return,
-      Int,
-      Eof
+    Plus,
+    Minus,
+    Star,
+    Slash,
+    LParent,
+    RParent,
+    LBrace,
+    RBrace,
+    Semicolon,
+    Assign,
+    Comma,
+    Amp,
+    Equal,
+    PipeEqual,
+    Greater,
+    GreaterEqual,
+    Lesser,
+    LesserEqual,
+    If,
+    Else,
+    While,
+    Do,
+    For,
+    Return,
+    Int,
+    Num,
+    Identifier,
+    Eof
   };
 
   struct SourceLocation
@@ -112,6 +112,7 @@ namespace C100
     void GetNextToken();
     void GetNextChar();
     void ExpectToken(TokenKind kind);
+    void SkipToken(TokenKind kind);
 
     void BeginPeekToken();
     void EndPeekToken();
