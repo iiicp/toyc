@@ -69,9 +69,12 @@ namespace C100
     node->Stmt->Accept(this);
   }
   void TypeVisitor::VisitorForStmtNode(ForStmtNode *node) {
-    node->Init->Accept(this);
-    node->Cond->Accept(this);
-    node->Inc->Accept(this);
+    if (node->Init)
+      node->Init->Accept(this);
+    if (node->Cond)
+      node->Cond->Accept(this);
+    if (node->Inc)
+      node->Inc->Accept(this);
     node->Stmt->Accept(this);
   }
   void TypeVisitor::VisitorBlockStmtNode(BlockStmtNode *node)  {
@@ -158,7 +161,7 @@ namespace C100
     }
   }
 
-  void TypeVisitor::VisitorConstantNode(ConstantNode *node) {
+  void TypeVisitor::VisitorNumNode(NumNode *node) {
     node->Ty = Type::IntType;
   }
   void TypeVisitor::VisitorVarExprNode(VarExprNode *node) {

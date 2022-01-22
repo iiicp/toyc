@@ -2,13 +2,8 @@
 
 build step:
   1. cd c100/
-  2. mkdir cmake-build-debug
-  3. cd cmake-build-debug 
-  4. cmake ..
-  5. make
-  6. ./c100 ../testcode/arith.c > tmp.s
-  7. clang tmp.s ../testcode/common.c -o tmp.out
-  8. ./tmp.out
+  2. cd testcode/
+  3. python build.py
 
 day1: 支持编译5+1-3*4/2   
 day2: 支持编译5+(1-3)*4/2   

@@ -167,7 +167,7 @@ void CodeGen::VisitorBinaryNode(BinaryNode *node)
   }
 }
 
-void CodeGen::VisitorConstantNode(ConstantNode *node)
+void CodeGen::VisitorNumNode(NumNode *node)
 {
   printf("\tmov $%d, %%rax\n", node->Value);
 }

@@ -23,7 +23,7 @@ namespace C100 {
       i++;
     }
     fprintf(stderr, "\n");
-    fprintf(stderr, "%*s", len+loc.Col,"");
+    fprintf(stderr, "%*s", len + loc.Col,"");
     fprintf(stderr, "^");
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");

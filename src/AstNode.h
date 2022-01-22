@@ -169,7 +169,7 @@ namespace C100
     BinaryOperator BinOp;
     std::shared_ptr<AstNode> Lhs{nullptr};
     std::shared_ptr<AstNode> Rhs{nullptr};
-    BinaryNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
+    BinaryNode(BinaryOperator op, std::shared_ptr<Token> tok) : AstNode(tok), BinOp(op) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -185,15 +185,15 @@ namespace C100
   public:
     UnaryOperator Uop;
     std::shared_ptr<AstNode> Lhs{nullptr};
-    UnaryNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
+    UnaryNode(UnaryOperator op, std::shared_ptr<Token> tok) : AstNode(tok), Uop(op) {}
     void Accept(AstVisitor *visitor) override;
   };
 
-  class ConstantNode : public AstNode
+  class NumNode : public AstNode
   {
   public:
     int Value;
-    ConstantNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
+    NumNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };
 
@@ -242,7 +242,7 @@ namespace C100
     virtual void VisitorSizeofExprNode(SizeofExprNode *node) = 0;
     virtual void VisitorBinaryNode(BinaryNode *node) = 0;
     virtual void VisitorUnaryNode(UnaryNode *node) = 0;
-    virtual void VisitorConstantNode(ConstantNode *node) = 0;
+    virtual void VisitorNumNode(NumNode *node) = 0;
     virtual void VisitorVarExprNode(VarExprNode *node) = 0;
   };
 }

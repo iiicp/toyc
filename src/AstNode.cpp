@@ -23,9 +23,9 @@ void BinaryNode::Accept(AstVisitor *visitor)
 }
 
 
-void ConstantNode::Accept(AstVisitor *visitor)
+void NumNode::Accept(AstVisitor *visitor)
 {
-  visitor->VisitorConstantNode(this);
+  visitor->VisitorNumNode(this);
 }
 
 void ExprStmtNode::Accept(AstVisitor *visitor)

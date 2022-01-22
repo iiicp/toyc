@@ -42,7 +42,7 @@ namespace C100 {
     void VisitorDeclarationStmtNode(DeclarationStmtNode *node) override;
     void VisitorBinaryNode(BinaryNode *node) override;
     void VisitorUnaryNode(UnaryNode *node) override;
-    void VisitorConstantNode(ConstantNode *node) override;
+    void VisitorNumNode(NumNode *node) override;
     void VisitorVarExprNode(VarExprNode *node)override;
 
     void Push();
