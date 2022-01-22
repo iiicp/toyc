@@ -26,6 +26,8 @@ namespace C100
     Slash,
     LParent,
     RParent,
+    LBracket,
+    RBracket,
     LBrace,
     RBrace,
     Semicolon,

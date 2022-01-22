@@ -31,12 +31,8 @@ namespace C100
     return TC == TypeClass::FunctionType;
   }
 
-  int Type::GetSize() const {
-    return Size;
-  }
-
-  int Type::GetAlign() const {
-    return Align;
+  bool Type::IsArrayType() const {
+    return TC == TypeClass::ArrayType;
   }
 
   void TypeVisitor::VisitorProgramNode(ProgramNode *node) {
@@ -146,7 +142,10 @@ namespace C100
     case UnaryOperator::Star: {
       if (node->Lhs->Ty->IsPointerType()) {
         node->Ty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty)->Base;
-      } else {
+      }else if (node->Lhs->Ty->IsArrayType()) {
+        node->Ty = std::dynamic_pointer_cast<ArrayType>(node->Lhs->Ty)->ElementType;
+      }
+      else {
         DiagLoc(node->Tok->Location, "invalid dereference operation");
         assert(0);
       }

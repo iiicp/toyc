@@ -29,9 +29,9 @@ day13: 添加一元操作符的支持，支持注释操作. 能编译
 day14: 添加指针运算和sizeof操作
 
 int main() {
-    int x=3;
-    int y=4;
-    *(&x+1) = 5;
-    return x;
+    int a[2][3];
+    int *p = &a;
+    *(p+3) = 5;
+    return *(*a+3);
 }
 

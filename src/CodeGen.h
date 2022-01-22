@@ -49,6 +49,8 @@ namespace C100 {
     void Pop(const char *reg);
 
     void GenAddr(AstNode *node);
+    void Load(std::shared_ptr<Type> ty);
+    void Store(std::shared_ptr<Type> ty);
 
     int AlignTo(int size, int align);
   };

@@ -71,6 +71,14 @@ void Lexer::GetNextToken() {
     kind = TokenKind::RParent;
     GetNextChar();
   }
+  else if (CurChar == '[') {
+    kind = TokenKind::LBracket;
+    GetNextChar();
+  }
+  else if (CurChar == ']') {
+    kind = TokenKind::RBracket;
+    GetNextChar();
+  }
   else if (CurChar == '{') {
     kind = TokenKind::LBrace;
     GetNextChar();
@@ -206,6 +214,8 @@ const char  *Lexer::GetTokenSimpleSpelling(TokenKind kind){
   case TokenKind::Slash: return "/";
   case TokenKind::LParent: return "(";
   case TokenKind::RParent: return ")";
+  case TokenKind::LBracket: return "[";
+  case TokenKind::RBracket: return "]";
   case TokenKind::LBrace: return "{";
   case TokenKind::RBrace: return "}";
   case TokenKind::Semicolon: return ";";

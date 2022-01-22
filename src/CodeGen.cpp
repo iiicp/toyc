@@ -34,18 +34,19 @@ void CodeGen::VisitorFunctionNode(FunctionNode *node)
   printf("_%s:\n",CurrentFuncName.data());
 #endif
 
-  int stackSize = 0;
-  for (auto &V : node->Locals)
+  int offset = 0;
+  for (auto &var : node->Locals)
   {
-    stackSize += 8;
-    V->Offset = stackSize * -1;
+    offset += var->Ty->Size;
+    offset = AlignTo(offset, var->Ty->Align);
+    var->Offset = -offset;
   }
 
-  stackSize = AlignTo(stackSize, 16);
+  offset = AlignTo(offset, 16);
 
   printf("\tpush %%rbp\n");
   printf("\tmov %%rsp, %%rbp\n");
-  printf("\tsub $%d, %%rsp\n", stackSize);
+  printf("\tsub $%d, %%rsp\n", offset);
 
   int i = 0;
   for (auto &var : node->Params) {
@@ -84,21 +85,36 @@ void CodeGen::VisitorBinaryNode(BinaryNode *node)
     printf("\tidiv %%rdi\n");
     break;
   case BinaryOperator::PtrAdd: {
-     auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty);
-     printf("\timul $%d, %%rdi\n", pty->GetSize());
+    if (node->Lhs->Ty->IsPointerType()) {
+      auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty);
+      printf("\timul $%d, %%rdi\n", pty->Size);
+    }else {
+      auto pty = std::dynamic_pointer_cast<ArrayType>(node->Lhs->Ty)->ElementType;
+      printf("\timul $%d, %%rdi\n", pty->Size);
+    }
      printf("\tadd %%rdi, %%rax\n");
      break;
   }
   case BinaryOperator::PtrSub: {
-    auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty);
-    printf("\timul $%d, %%rdi\n", pty->GetSize());
+    if (node->Lhs->Ty->IsPointerType()) {
+      auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty);
+      printf("\timul $%d, %%rdi\n", pty->Size);
+    }else {
+      auto pty = std::dynamic_pointer_cast<ArrayType>(node->Lhs->Ty)->ElementType;
+      printf("\timul $%d, %%rdi\n", pty->Size);
+    }
     printf("\tsub %%rdi, %%rax\n");
     break;
   }
   case BinaryOperator::PtrDiff: {
-    auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty);
     printf("\tsub %%rdi, %%rax\n");
-    printf("\tmov $%d, %%rdi\n", pty->GetSize());
+    if (node->Lhs->Ty->IsPointerType()) {
+      auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty);
+      printf("\tmov $%d, %%rdi\n", pty->Size);
+    }else {
+      auto pty = std::dynamic_pointer_cast<ArrayType>(node->Lhs->Ty)->ElementType;
+      printf("\tmov $%d, %%rdi\n", pty->Size);
+    }
     printf("\tcqo\n");
     printf("\tidiv %%rdi\n");
     break;
@@ -177,13 +193,12 @@ void CodeGen::VisitorAssignExprNode(AssignExprNode *node) {
   GenAddr(node->Lhs.get());
   Push();
   node->Rhs->Accept(this);
-  Pop("%rdi");
-  printf("\tmov %%rax, (%%rdi)\n");
+  Store(node->Ty);
 }
 
 void CodeGen::VisitorVarExprNode(VarExprNode *node) {
-  printf("\tlea %d(%%rbp), %%rax\n", node->VarObj->Offset);
-  printf("\tmov (%%rax), %%rax\n");
+  GenAddr(node);
+  Load(node->Ty);
 }
 
 void CodeGen::VisitorIfStmtNode(IfStmtNode *node) {
@@ -308,7 +323,7 @@ void CodeGen::VisitorUnaryNode(UnaryNode *node) {
   }
   case UnaryOperator::Star: {
     GenAddr(node);
-    printf("\tmov (%%rax), %%rax\n");
+    Load(node->Ty);
     break;
   }
   case UnaryOperator::Amp: {
@@ -335,6 +350,20 @@ void CodeGen::GenAddr(AstNode *node) {
 }
 
 void CodeGen::VisitorSizeofExprNode(SizeofExprNode *node) {
-  printf("\tmov $%d, %%rax\n", node->Ty->GetSize());
+  printf("\tmov $%d, %%rax\n", node->Ty->Size);
+}
+
+void CodeGen::Load(std::shared_ptr<Type> ty) {
+  if (ty->IsArrayType()) {
+    return;
+  }
+  if (ty->Size == 8)
+    printf("\tmov (%%rax), %%rax\n");
+}
+
+void CodeGen::Store(std::shared_ptr<Type> ty) {
+  Pop("%rdi");
+  if (ty->Size == 8)
+    printf("\tmov %%rax, (%%rdi)\n");
 }
 

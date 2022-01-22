@@ -20,6 +20,7 @@ namespace C100
   class BuildInType;
   class FunctionType;
   class PointerType;
+  class ArrayType;
   class Type
   {
   public:
@@ -27,11 +28,12 @@ namespace C100
     {
       BuildInType,
       FunctionType,
-      PointerType
+      PointerType,
+      ArrayType
     };
-  private:
     int Size;
     int Align;
+  private:
     TypeClass TC;
 
   public:
@@ -44,8 +46,7 @@ namespace C100
     bool IsIntegerType() const;
     bool IsPointerType() const;
     bool IsFunctionType() const;
-    int GetSize() const;
-    int GetAlign() const;
+    bool IsArrayType() const;
   };
 
   class BuildInType : public Type
@@ -87,6 +88,16 @@ namespace C100
     std::shared_ptr<Type> Base;
     PointerType(std::shared_ptr<Type> base)
         : Type(TypeClass::PointerType, 8, 8), Base(base) {}
+  };
+
+  class ArrayType : public Type
+  {
+  public:
+    std::shared_ptr<Type> ElementType;
+    int ArrayLen;
+    ArrayType(std::shared_ptr<Type> elementType, int len)
+    : Type(TypeClass::ArrayType, len * elementType->Size, elementType->Align),
+    ElementType(elementType), ArrayLen(len){}
   };
 
   class TypeVisitor : public AstVisitor

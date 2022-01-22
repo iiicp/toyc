@@ -71,9 +71,9 @@ std::shared_ptr<AstNode> Parser::ParseAddExpr()
     BinaryOperator bop;
 
     if (tok->Kind == TokenKind::Plus) {
-      if (left->Ty->IsPointerType() && right->Ty->IsIntegerType()) {
+      if ((left->Ty->IsPointerType() || left->Ty->IsArrayType()) && right->Ty->IsIntegerType()) {
         bop = BinaryOperator::PtrAdd;
-      } else if (left->Ty->IsIntegerType() && right->Ty->IsPointerType()) {
+      } else if (left->Ty->IsIntegerType() && (right->Ty->IsPointerType() || right->Ty->IsArrayType())) {
         auto tmp = left;
         left = right;
         right = tmp;
@@ -84,11 +84,11 @@ std::shared_ptr<AstNode> Parser::ParseAddExpr()
         DiagLoc(tok->Location, "invalid add operation");
       }
     }else {
-      if (left->Ty->IsPointerType() && right->Ty->IsIntegerType()) {
+      if ((left->Ty->IsPointerType() || left->Ty->IsArrayType()) && right->Ty->IsIntegerType()) {
         bop = BinaryOperator::PtrSub;
       } else if (left->Ty->IsIntegerType() && right->Ty->IsIntegerType()) {
         bop = BinaryOperator::Sub;
-      } else if (left->Ty->IsPointerType() && right->Ty->IsPointerType()) {
+      } else if ((left->Ty->IsPointerType() || left->Ty->IsArrayType()) && (right->Ty->IsPointerType() || right->Ty->IsArrayType())) {
         bop = BinaryOperator::PtrDiff;
       }
       else {
@@ -460,6 +460,14 @@ std::shared_ptr<Type> Parser::ParseTypeSuffix(std::shared_ptr<Type> baseType)
     funcTy->Params = params;
     Lex.ExpectToken(TokenKind::RParent);
     return funcTy;
+  }
+  else if (Lex.CurrentToken->Kind == TokenKind::LBracket) {
+    Lex.SkipToken(TokenKind::LBracket);
+    int num = Lex.CurrentToken->Value;
+    Lex.ExpectToken(TokenKind::Num);
+    Lex.ExpectToken(TokenKind::RBracket);
+    auto ty = ParseTypeSuffix(baseType);
+    return std::make_shared<ArrayType>(ty, num);
   }
   else {
     return baseType;
