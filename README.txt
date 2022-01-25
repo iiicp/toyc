@@ -24,11 +24,11 @@ day13: 添加一元操作符的支持，支持注释操作. 能编译
 day14: 添加指针运算和sizeof操作
 day15: 支持数组声明和指针访问
 day16: 支持数组索引，添加编译脚本
+day17: 支持char/short/long类型
 
 int main() {
-    int a[2][3];
-    a[1][0] = 5;
-    a[1][1] = 6;
-    return a[1][0] * a[1][1];
+    int x = 4567456745;
+    char *p = &x;
+    return *(p+1);
 }
 

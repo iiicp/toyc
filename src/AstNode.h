@@ -192,7 +192,7 @@ namespace C100
   class NumNode : public AstNode
   {
   public:
-    int Value;
+    long Value;
     NumNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
     void Accept(AstVisitor *visitor) override;
   };

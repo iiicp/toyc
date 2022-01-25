@@ -50,7 +50,17 @@ void CodeGen::VisitorFunctionNode(FunctionNode *node)
 
   int i = 0;
   for (auto &var : node->Params) {
-    printf("\tmov %s, %d(%%rbp)\n", Reg64[i++], var->Offset);
+    if (var->Ty->Size == 1) {
+      printf("\tmov %s, %d(%%rbp)\n", Reg8[i++], var->Offset);
+    }else if (var->Ty->Size == 2) {
+      printf("\tmov %s, %d(%%rbp)\n", Reg16[i++], var->Offset);
+    }else if (var->Ty->Size == 4) {
+      printf("\tmov %s, %d(%%rbp)\n", Reg32[i++], var->Offset);
+    }else if (var->Ty->Size == 8) {
+      printf("\tmov %s, %d(%%rbp)\n", Reg64[i++], var->Offset);
+    }else {
+      assert(0);
+    }
   }
 
   for (auto &S : node->Stmts) {
@@ -86,7 +96,7 @@ void CodeGen::VisitorBinaryNode(BinaryNode *node)
     break;
   case BinaryOperator::PtrAdd: {
     if (node->Lhs->Ty->IsPointerType()) {
-      auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty);
+      auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty)->Base;
       printf("\timul $%d, %%rdi\n", pty->Size);
     }else {
       auto pty = std::dynamic_pointer_cast<ArrayType>(node->Lhs->Ty)->ElementType;
@@ -97,7 +107,7 @@ void CodeGen::VisitorBinaryNode(BinaryNode *node)
   }
   case BinaryOperator::PtrSub: {
     if (node->Lhs->Ty->IsPointerType()) {
-      auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty);
+      auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty)->Base;
       printf("\timul $%d, %%rdi\n", pty->Size);
     }else {
       auto pty = std::dynamic_pointer_cast<ArrayType>(node->Lhs->Ty)->ElementType;
@@ -109,7 +119,7 @@ void CodeGen::VisitorBinaryNode(BinaryNode *node)
   case BinaryOperator::PtrDiff: {
     printf("\tsub %%rdi, %%rax\n");
     if (node->Lhs->Ty->IsPointerType()) {
-      auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty);
+      auto pty = std::dynamic_pointer_cast<PointerType>(node->Lhs->Ty)->Base;
       printf("\tmov $%d, %%rdi\n", pty->Size);
     }else {
       auto pty = std::dynamic_pointer_cast<ArrayType>(node->Lhs->Ty)->ElementType;
@@ -169,7 +179,7 @@ void CodeGen::VisitorBinaryNode(BinaryNode *node)
 
 void CodeGen::VisitorNumNode(NumNode *node)
 {
-  printf("\tmov $%d, %%rax\n", node->Value);
+  printf("\tmovabs $%ld, %%rax\n", node->Value);
 }
 
 void CodeGen::Push()
@@ -357,13 +367,31 @@ void CodeGen::Load(std::shared_ptr<Type> ty) {
   if (ty->IsArrayType()) {
     return;
   }
-  if (ty->Size == 8)
+  if (ty->Size == 1) {
+    printf("\tmovsb (%%rax), %%rax\n");
+  }else if (ty->Size == 2) {
+    printf("\tmovsw (%%rax), %%rax\n");
+  }else if (ty->Size == 4) {
+    printf("\tmovsl (%%rax), %%rax\n");
+  }else if (ty->Size == 8) {
     printf("\tmov (%%rax), %%rax\n");
+  }else {
+    assert(0);
+  }
 }
 
 void CodeGen::Store(std::shared_ptr<Type> ty) {
   Pop("%rdi");
-  if (ty->Size == 8)
+  if (ty->Size == 1) {
+    printf("\tmov %%al, (%%rdi)\n");
+  }else if (ty->Size == 2) {
+    printf("\tmov %%ax, (%%rdi)\n");
+  }else if (ty->Size == 4) {
+    printf("\tmov %%eax, (%%rdi)\n");
+  }else if (ty->Size == 8) {
     printf("\tmov %%rax, (%%rdi)\n");
+  }else {
+    assert(0);
+  }
 }
 

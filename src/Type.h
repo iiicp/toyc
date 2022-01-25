@@ -37,7 +37,10 @@ namespace C100
     TypeClass TC;
 
   public:
+    static std::shared_ptr<BuildInType> CharType;
+    static std::shared_ptr<BuildInType> ShortType;
     static std::shared_ptr<BuildInType> IntType;
+    static std::shared_ptr<BuildInType> LongType;
 
   public:
     virtual ~Type() {}
@@ -54,7 +57,10 @@ namespace C100
   public:
     enum class Kind
     {
-      Int
+      Char,
+      Short,
+      Int,
+      Long
     };
   private:
     Kind Kd;

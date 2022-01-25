@@ -157,8 +157,14 @@ void Lexer::GetNextToken() {
         kind = TokenKind::For;
       }else if (content == "return") {
         kind = TokenKind::Return;
+      }else if (content == "char") {
+        kind = TokenKind::Char;
+      }else if (content == "short") {
+        kind = TokenKind::Short;
       }else if (content == "int") {
         kind = TokenKind::Int;
+      }else if (content == "long") {
+        kind = TokenKind::Long;
       }else if (content == "sizeof") {
         kind = TokenKind::SizeOf;
       }

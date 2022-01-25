@@ -13,12 +13,18 @@
 
 namespace C100
 {
-  std::shared_ptr<BuildInType> Type::IntType = std::make_shared<BuildInType>(BuildInType::Kind::Int, 8, 8);
+  std::shared_ptr<BuildInType> Type::CharType = std::make_shared<BuildInType>(BuildInType::Kind::Char, 1, 1);
+  std::shared_ptr<BuildInType> Type::ShortType = std::make_shared<BuildInType>(BuildInType::Kind::Short, 2, 2);
+  std::shared_ptr<BuildInType> Type::IntType = std::make_shared<BuildInType>(BuildInType::Kind::Int, 4, 4);
+  std::shared_ptr<BuildInType> Type::LongType = std::make_shared<BuildInType>(BuildInType::Kind::Long, 8, 8);
 
   bool Type::IsIntegerType() const{
     if (TC == TypeClass::BuildInType) {
       auto bi = dynamic_cast<const BuildInType *>(this);
-      return bi->GetKind() == BuildInType::Kind::Int;
+      return bi->GetKind() == BuildInType::Kind::Char
+            || bi->GetKind() == BuildInType::Kind::Short
+            || bi->GetKind() == BuildInType::Kind::Int
+            || bi->GetKind() == BuildInType::Kind::Long;
     }
     return false;
   }
@@ -46,7 +52,7 @@ namespace C100
   void TypeVisitor::VisitorFuncCallNode(FuncCallNode *node) {
     for (auto &arg : node->Args)
       arg->Accept(this);
-    node->Ty = Type::IntType;
+    node->Ty = Type::LongType;
   }
   void TypeVisitor::VisitorExprStmtNode(ExprStmtNode *node) {
     if (node->Lhs) {
@@ -126,7 +132,7 @@ namespace C100
     case BinaryOperator::Lesser:
     case BinaryOperator::LesserEqual:
     case BinaryOperator::PtrDiff:
-      node->Ty = Type::IntType;
+      node->Ty = Type::LongType;
       break;
     default:
       assert(0);
@@ -162,7 +168,7 @@ namespace C100
   }
 
   void TypeVisitor::VisitorNumNode(NumNode *node) {
-    node->Ty = Type::IntType;
+    node->Ty = Type::LongType;
   }
   void TypeVisitor::VisitorVarExprNode(VarExprNode *node) {
     node->Ty = node->VarObj->Ty;

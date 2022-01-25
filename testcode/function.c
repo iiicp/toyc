@@ -1,4 +1,16 @@
-int add(int a, int b, int c,int d,int e,int f) {
+char add_char(char a, char b, char c,char d,char e,char f) {
+  return a+b+c+d+e+f;
+}
+
+short add_short(short a, short b, short c,short d,short e,short f) {
+  return a+b+c+d+e+f;
+}
+
+int add_int(int a, int b, int c,int d,int e,int f) {
+  return a+b+c+d+e+f;
+}
+
+long add_long(long a, long b, long c,int d,long e,char f) {
   return a+b+c+d+e+f;
 }
 
@@ -22,6 +34,10 @@ int fib(int n) {
 }
 
 int main() {
+  assert(1+2+3+4+5+6, add_char(1,2,3,4,5,6));
+  assert(1+2+3+4+5+6, add_short(1,2,3,4,5,6));
+  assert(1+2+3+4+5+6, add_int(1,2,3,4,5,6));
+  assert(1+2+3+4+5+6, add_long(1,2,3,4,5,6));
   assert(89, fib(sum(({int i = 4, j;}))));
   assert(17711, fib(sum(({int i = 4, j = 5; j * 2 - i;}))));
   return 0;

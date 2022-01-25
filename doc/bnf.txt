@@ -39,7 +39,7 @@ PrimaryExpr          :=      Num
 -----------------------------------------
 Prog                 :=      Function*
 Function             :=      DeclarationSpec Declarator "{"Stmt*"}"
-DeclarationSpec      :=      int
+DeclarationSpec      :=      char | short | int | long
 Declarator           :=      (*)* identifier TypeSuffix
 TypeSuffix           :=      "("FuncArg?")"
                      :=      "["Number"]"+

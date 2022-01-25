@@ -20,6 +20,9 @@ namespace C100 {
   private:
     int StackLevel{0};
     int Sequence{0};
+    const char *Reg8[6] = {"%dil", "%sil", "%dl", "%cl", "%r8b", "%r9b"};
+    const char *Reg16[6] = {"%di", "%si", "%dx", "%cx", "%r8w", "%r9w"};
+    const char *Reg32[6] = {"%edi", "%esi", "%edx", "%ecx", "%r8d", "%r9d"};
     const char *Reg64[6] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
     std::string CurrentFuncName;
   public:

@@ -438,9 +438,21 @@ std::shared_ptr<AstNode> Parser::ParseFuncCallNode(std::shared_ptr<Token> nameTo
 }
 
 std::shared_ptr<Type> Parser::ParseDeclarationSpec() {
+  if (Lex.CurrentToken->Kind == TokenKind::Char) {
+    Lex.SkipToken(TokenKind::Char);
+    return Type::CharType;
+  }
+  if (Lex.CurrentToken->Kind == TokenKind::Short) {
+    Lex.SkipToken(TokenKind::Short);
+    return Type::ShortType;
+  }
   if (Lex.CurrentToken->Kind == TokenKind::Int) {
-    Lex.GetNextToken();
+    Lex.SkipToken(TokenKind::Int);
     return Type::IntType;
+  }
+  if (Lex.CurrentToken->Kind == TokenKind::Long) {
+    Lex.SkipToken(TokenKind::Long);
+    return Type::LongType;
   }
   DiagLoc(Lex.CurrentToken->Location, "type not support yet!");
   return nullptr;
@@ -504,7 +516,10 @@ std::shared_ptr<Type> Parser::ParseTypeSuffix(std::shared_ptr<Type> baseType)
 }
 
 bool Parser::IsTypeName() {
-  return Lex.CurrentToken->Kind == TokenKind::Int;
+  return Lex.CurrentToken->Kind == TokenKind::Char
+      || Lex.CurrentToken->Kind == TokenKind::Short
+      || Lex.CurrentToken->Kind == TokenKind::Int
+      || Lex.CurrentToken->Kind == TokenKind::Long;
 }
 
 std::shared_ptr<VarExprNode> Parser::MakeVarNode(std::shared_ptr<Var> var, std::shared_ptr<Token> tok) {

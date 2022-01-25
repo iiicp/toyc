@@ -16,8 +16,8 @@ int main() {
   assert(5, ({int a[3]; int *x = a; *x = 4; *(x+1) = 5; *(x+2) = 6; *(a+1);}));
   assert(6, ({int a[3]; int *x = a; *x = 4; *(x+1) = 5; *(x+2) = 6; *(a+2);}));
 
-  assert(3*8, ({int a[3]; sizeof(a);}));
-  assert(12*8, ({int a[3][4]; sizeof(a);}));
+  assert(3*4, ({int a[3]; sizeof(a);}));
+  assert(12*4, ({int a[3][4]; sizeof(a);}));
 
   assert(4, ({int a[3]; int *x = a; *x = 4; *(x+1) = 5; *(x+2) = 6; a[0];}));
   assert(5, ({int a[3]; int *x = a; *x = 4; *(x+1) = 5; *(x+2) = 6; a[1];}));
@@ -55,5 +55,11 @@ int main() {
   assert(2, ({int a[2][3]; int *x = &a[1]; *x = 0; *(x+1) = 1; *(x+2) = 2;a[1][2];}));
 
   assert(30, ({ int a[2][3]; a[1][0] = 5;a[1][1] = 6;a[1][0] * a[1][1];}));
+
+  assert(10*1, ({char a[10]; sizeof(a);}));
+  assert(10*2, ({short a[10]; sizeof(a);}));
+  assert(10*4, ({int a[10]; sizeof(a);}));
+  assert(10*8, ({long a[10]; sizeof(a);}));
+
   return 0;
 }
