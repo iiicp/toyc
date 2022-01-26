@@ -25,10 +25,23 @@ day14: 添加指针运算和sizeof操作
 day15: 支持数组声明和指针访问
 day16: 支持数组索引，添加编译脚本
 day17: 支持char/short/long类型
+day18: 支持struct/union声明和成员访问
 
 int main() {
-    int x = 4567456745;
-    char *p = &x;
-    return *(p+1);
+    struct {
+        char c[3];
+        int a[4];
+        long b;
+        struct {
+            char c;
+            int a;
+            long b;
+        } s;
+    } s;
+    s.c[0] = 2;
+    s.s.c = 0;
+    s.s.a = 2;
+    s.s.b = 0;
+   return s.c[0] + s.s.c + s.s.a + s.s.b;
 }
 
