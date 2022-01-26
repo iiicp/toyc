@@ -37,8 +37,8 @@ std::shared_ptr<AstNode> Parser::ParseFunction()
   node->FuncName = tok->Content;
 
   auto funcTy = std::dynamic_pointer_cast<FunctionType>(ty);
-  for (auto it = funcTy->Params.rbegin(); it != funcTy->Params.rend(); ++it) {
-     node->Params.push_front(MakeLocalVar((*it)->Tok->Content, (*it)->Ty));
+  for (auto &param : funcTy->Params) {
+     node->Params.push_back(MakeLocalVar(param->Tok->Content, param->Ty));
   }
   node->Ty = funcTy;
   Lex.ExpectToken(TokenKind::LBrace);
@@ -416,7 +416,7 @@ std::shared_ptr<Var> Parser::MakeLocalVar(std::string_view name, std::shared_ptr
   obj->Name = name;
   obj->Ty = ty;
   obj->Offset = 0;
-  Locals->push_front(obj);
+  Locals->push_back(obj);
   LocalsMap[name] = obj;
   return obj;
 }
