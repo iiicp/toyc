@@ -124,7 +124,7 @@ std::shared_ptr<AstNode> Parser::ParseMultiExpr()
 std::shared_ptr<AstNode> Parser::ParsePostFixExpr() {
   auto left = ParsePrimaryExpr();
   while (true) {
-//    if (Lex.CurrentToken->Kind == TokenKind::LParent) {
+//    if (Lex.CurrentToken->Kind == TokenKind::LParen) {
 //      return ParseFuncCallNode(left->Tok);
 //    }
 //    else
@@ -189,27 +189,27 @@ std::shared_ptr<AstNode> Parser::ParseUnaryExpr() {
 
 std::shared_ptr<AstNode> Parser::ParsePrimaryExpr()
 {
-    if (Lex.CurrentToken->Kind == TokenKind::LParent) {
+    if (Lex.CurrentToken->Kind == TokenKind::LParen) {
         Lex.BeginPeekToken();
         Lex.GetNextToken();
         if (Lex.CurrentToken->Kind == TokenKind::LBrace) {
           Lex.EndPeekToken();
           auto tok = Lex.CurrentToken;
-          Lex.SkipToken(TokenKind::LParent);
+          Lex.SkipToken(TokenKind::LParen);
           Lex.SkipToken(TokenKind::LBrace);
           auto node = std::make_shared<StmtExprNode>(tok);
           while (Lex.CurrentToken->Kind != TokenKind::RBrace) {
             node->Stmts.push_back(ParseStmt());
           }
           Lex.SkipToken(TokenKind::RBrace);
-          Lex.ExpectToken(TokenKind::RParent);
+          Lex.ExpectToken(TokenKind::RParen);
           return node;
         }
         Lex.EndPeekToken();
 
         Lex.GetNextToken();
         auto node = ParseExpr();
-        Lex.ExpectToken(TokenKind::RParent);
+        Lex.ExpectToken(TokenKind::RParen);
         return node;
     }else if (Lex.CurrentToken->Kind == TokenKind::Num) {
         auto node = std::make_shared<NumNode>(Lex.CurrentToken);
@@ -220,7 +220,7 @@ std::shared_ptr<AstNode> Parser::ParsePrimaryExpr()
 
         Lex.BeginPeekToken();
         Lex.GetNextToken();
-        if (Lex.CurrentToken->Kind == TokenKind::LParent) {
+        if (Lex.CurrentToken->Kind == TokenKind::LParen) {
           Lex.EndPeekToken();
           auto tok = Lex.CurrentToken;
           Lex.SkipToken(TokenKind::Identifier);
@@ -253,9 +253,9 @@ std::shared_ptr<AstNode> Parser::ParseStmt()
   if (Lex.CurrentToken->Kind == TokenKind::If) {
     auto node = std::make_shared<IfStmtNode>(Lex.CurrentToken);
     Lex.SkipToken(TokenKind::If);
-    Lex.ExpectToken(TokenKind::LParent);
+    Lex.ExpectToken(TokenKind::LParen);
     node->Cond = ParseExpr();
-    Lex.ExpectToken(TokenKind::RParent);
+    Lex.ExpectToken(TokenKind::RParen);
     node->Then = ParseStmt();
     if (Lex.CurrentToken->Kind == TokenKind::Else) {
       Lex.SkipToken(TokenKind::Else);
@@ -266,9 +266,9 @@ std::shared_ptr<AstNode> Parser::ParseStmt()
   else if (Lex.CurrentToken->Kind == TokenKind::While) {
     auto node = std::make_shared<WhileStmtNode>(Lex.CurrentToken);
     Lex.SkipToken(TokenKind::While);
-    Lex.ExpectToken(TokenKind::LParent);
+    Lex.ExpectToken(TokenKind::LParen);
     node->Cond = ParseExpr();
-    Lex.ExpectToken(TokenKind::RParent);
+    Lex.ExpectToken(TokenKind::RParen);
     node->Then = ParseStmt();
     return node;
   }
@@ -277,25 +277,25 @@ std::shared_ptr<AstNode> Parser::ParseStmt()
     Lex.SkipToken(TokenKind::Do);
     node->Stmt = ParseStmt();
     Lex.ExpectToken(TokenKind::While);
-    Lex.ExpectToken(TokenKind::LParent);
+    Lex.ExpectToken(TokenKind::LParen);
     node->Cond = ParseExpr();
-    Lex.ExpectToken(TokenKind::RParent);
+    Lex.ExpectToken(TokenKind::RParen);
     Lex.ExpectToken(TokenKind::Semicolon);
     return node;
   }
   else if (Lex.CurrentToken->Kind == TokenKind::For) {
     auto node = std::make_shared<ForStmtNode>(Lex.CurrentToken);
     Lex.SkipToken(TokenKind::For);
-    Lex.ExpectToken(TokenKind::LParent);
+    Lex.ExpectToken(TokenKind::LParen);
     if (Lex.CurrentToken->Kind != TokenKind::Semicolon)
       node->Init = ParseExpr();
     Lex.ExpectToken(TokenKind::Semicolon);
     if (Lex.CurrentToken->Kind != TokenKind::Semicolon)
       node->Cond = ParseExpr();
     Lex.ExpectToken(TokenKind::Semicolon);
-    if (Lex.CurrentToken->Kind != TokenKind::RParent)
+    if (Lex.CurrentToken->Kind != TokenKind::RParen)
       node->Inc = ParseExpr();
-    Lex.ExpectToken(TokenKind::RParent);
+    Lex.ExpectToken(TokenKind::RParen);
     node->Stmt = ParseStmt();
     return node;
   }
@@ -425,15 +425,15 @@ std::shared_ptr<AstNode> Parser::ParseFuncCallNode(std::shared_ptr<Token> nameTo
 
   auto node = std::make_shared<FuncCallNode>(nameTok);
   node->FuncName = nameTok->Content;
-  Lex.ExpectToken(TokenKind::LParent);
-  if (Lex.CurrentToken->Kind != TokenKind::RParent) {
+  Lex.ExpectToken(TokenKind::LParen);
+  if (Lex.CurrentToken->Kind != TokenKind::RParen) {
     node->Args.push_back(ParseAssignExpr());
     while (Lex.CurrentToken->Kind == TokenKind::Comma) {
       Lex.GetNextToken();
       node->Args.push_back(ParseAssignExpr());
     }
   }
-  Lex.ExpectToken(TokenKind::RParent);
+  Lex.ExpectToken(TokenKind::RParen);
   return node;
 }
 
@@ -478,18 +478,18 @@ std::shared_ptr<Type> Parser::ParseDeclarator(std::shared_ptr<Type> baseType, st
 
 std::shared_ptr<Type> Parser::ParseTypeSuffix(std::shared_ptr<Type> baseType)
 {
-  if (Lex.CurrentToken->Kind == TokenKind::LParent) {
+  if (Lex.CurrentToken->Kind == TokenKind::LParen) {
     auto funcTy = std::make_shared<FunctionType>(baseType);
     Lex.GetNextToken();
     std::list<std::shared_ptr<Param>> params;
-    if (Lex.CurrentToken->Kind != TokenKind::RParent) {
+    if (Lex.CurrentToken->Kind != TokenKind::RParen) {
       std::shared_ptr<Token> tok;
       auto ty = ParseDeclarator(ParseDeclarationSpec(), tok);
       auto pa = std::make_shared<Param>();
       pa->Ty = ty;
       pa->Tok = tok;
       params.push_back(pa);
-      while (Lex.CurrentToken->Kind != TokenKind::RParent) {
+      while (Lex.CurrentToken->Kind != TokenKind::RParen) {
         Lex.ExpectToken(TokenKind::Comma);
         auto ty = ParseDeclarator(ParseDeclarationSpec(), tok);
         auto pa = std::make_shared<Param>();
@@ -499,7 +499,7 @@ std::shared_ptr<Type> Parser::ParseTypeSuffix(std::shared_ptr<Type> baseType)
       }
     }
     funcTy->Params = params;
-    Lex.ExpectToken(TokenKind::RParent);
+    Lex.ExpectToken(TokenKind::RParen);
     return funcTy;
   }
   else if (Lex.CurrentToken->Kind == TokenKind::LBracket) {

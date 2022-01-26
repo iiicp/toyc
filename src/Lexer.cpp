@@ -64,11 +64,11 @@ void Lexer::GetNextToken() {
     GetNextChar();
   }
   else if (CurChar == '(') {
-    kind = TokenKind::LParent;
+    kind = TokenKind::LParen;
     GetNextChar();
   }
   else if (CurChar == ')') {
-    kind = TokenKind::RParent;
+    kind = TokenKind::RParen;
     GetNextChar();
   }
   else if (CurChar == '[') {
@@ -218,8 +218,8 @@ const char  *Lexer::GetTokenSimpleSpelling(TokenKind kind){
   case TokenKind::Minus: return "-";
   case TokenKind::Star: return "*";
   case TokenKind::Slash: return "/";
-  case TokenKind::LParent: return "(";
-  case TokenKind::RParent: return ")";
+  case TokenKind::LParen: return "(";
+  case TokenKind::RParen: return ")";
   case TokenKind::LBracket: return "[";
   case TokenKind::RBracket: return "]";
   case TokenKind::LBrace: return "{";

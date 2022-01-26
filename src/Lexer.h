@@ -20,39 +20,18 @@ namespace C100
 {
   enum class TokenKind
   {
-    Plus,
-    Minus,
-    Star,
-    Slash,
-    LParent,
-    RParent,
-    LBracket,
-    RBracket,
-    LBrace,
-    RBrace,
-    Semicolon,
-    Assign,
-    Comma,
-    Amp,
-    Equal,
-    PipeEqual,
-    Greater,
-    GreaterEqual,
-    Lesser,
-    LesserEqual,
-    If,
-    Else,
-    While,
-    Do,
-    For,
-    Return,
-    Char,
-    Short,
-    Int,
-    Long,
-    SizeOf,
-    Num,
     Identifier,
+
+    If, Else, While, Do, For, Return,
+    Char, Short, Int, Long, SizeOf,
+
+    Plus, Minus, Star, Slash, LParen,
+    RParen, LBracket, RBracket, LBrace, RBrace,
+    Semicolon, Assign, Comma, Amp, Equal,
+    PipeEqual, Greater, GreaterEqual, Lesser,
+    LesserEqual,
+
+    Num,
     Eof
   };
 

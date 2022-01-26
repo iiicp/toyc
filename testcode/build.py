@@ -34,6 +34,7 @@ def testAll():
     for f in file:
         testOne(f)
 
+    print('all done!!!')
 
 if __name__ == '__main__':
     print ('开始测试: ', str(sys.argv))
