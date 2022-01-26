@@ -95,3 +95,13 @@ void UnaryNode::Accept(AstVisitor *visitor) {
 void SizeofExprNode::Accept(AstVisitor *visitor) {
   visitor->VisitorSizeofExprNode(this);
 }
+
+void MemberAccessNode::Accept(AstVisitor *visitor) {
+  visitor->VisitorMemberAccessNode(this);
+}
+
+namespace C100 {
+int AlignTo(int size, int align) {
+    return (size + align - 1) / align * align;
+  }
+}

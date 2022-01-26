@@ -24,12 +24,13 @@ namespace C100
 
     If, Else, While, Do, For, Return,
     Char, Short, Int, Long, SizeOf,
+    Struct, Union,
 
     Plus, Minus, Star, Slash, LParen,
     RParen, LBracket, RBracket, LBrace, RBrace,
     Semicolon, Assign, Comma, Amp, Equal,
     PipeEqual, Greater, GreaterEqual, Lesser,
-    LesserEqual,
+    LesserEqual, Period,
 
     Num,
     Eof

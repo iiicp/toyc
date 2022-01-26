@@ -45,6 +45,11 @@ namespace C100
     std::shared_ptr<Type> ParseDeclarator(std::shared_ptr<Type> baseType, std::shared_ptr<Token> &tok);
     std::shared_ptr<Type> ParseTypeSuffix(std::shared_ptr<Type> baseType);
 
+    std::shared_ptr<RecordType> ParseStructOrUnionDeclaration(bool isStruct);
+    std::shared_ptr<Type> ParseStructDeclaration();
+    std::shared_ptr<Type> ParseUnionDeclaration();
+    std::shared_ptr<AstNode> MakeMemberAccessNode(std::shared_ptr<AstNode> left);
+
     std::shared_ptr<AstNode> ParseFuncCallNode(std::shared_ptr<Token> nameTok);
     std::shared_ptr<Var> FindLocalVar(std::string_view name);
     std::shared_ptr<Var> MakeLocalVar(std::string_view name, std::shared_ptr<Type> ty);

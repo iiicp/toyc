@@ -47,6 +47,7 @@ namespace C100 {
     void VisitorUnaryNode(UnaryNode *node) override;
     void VisitorNumNode(NumNode *node) override;
     void VisitorVarExprNode(VarExprNode *node)override;
+    void VisitorMemberAccessNode(MemberAccessNode *node) override;
 
     void Push();
     void Pop(const char *reg);
@@ -55,7 +56,7 @@ namespace C100 {
     void Load(std::shared_ptr<Type> ty);
     void Store(std::shared_ptr<Type> ty);
 
-    int AlignTo(int size, int align);
+
   };
 }
 

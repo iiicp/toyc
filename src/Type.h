@@ -21,6 +21,7 @@ namespace C100
   class FunctionType;
   class PointerType;
   class ArrayType;
+  class RecordType;
   class Type
   {
   public:
@@ -29,7 +30,8 @@ namespace C100
       BuildInType,
       FunctionType,
       PointerType,
-      ArrayType
+      ArrayType,
+      RecordType
     };
     int Size;
     int Align;
@@ -50,6 +52,8 @@ namespace C100
     bool IsPointerType() const;
     bool IsFunctionType() const;
     bool IsArrayType() const;
+    bool IsStructType() const;
+    bool IsUnionType() const;
   };
 
   class BuildInType : public Type
@@ -106,6 +110,28 @@ namespace C100
     ElementType(elementType), ArrayLen(len){}
   };
 
+  struct Filed {
+  public:
+    std::shared_ptr<Type> Ty;
+    std::shared_ptr<Token> Tok;
+    int Offset;
+    Filed(std::shared_ptr<Type> ty, std::shared_ptr<Token> tok, int offset)
+    : Ty(ty), Tok(tok), Offset(offset) {}
+
+  };
+
+  class RecordType : public Type
+  {
+  public:
+    enum class TagKind {
+      Struct,
+      Union
+    };
+    TagKind Kind;
+    std::list<std::shared_ptr<Filed>> Flds;
+    RecordType(TagKind kind) : Type(TypeClass::RecordType, 0, 1), Kind(kind) {}
+  };
+
   class TypeVisitor : public AstVisitor
   {
   public:
@@ -127,6 +153,7 @@ namespace C100
     void VisitorUnaryNode(UnaryNode *node) override;
     void VisitorNumNode(NumNode *node) override;
     void VisitorVarExprNode(VarExprNode *node) override;
+    void VisitorMemberAccessNode(MemberAccessNode *node) override;
 
     static TypeVisitor *Visitor();
   };

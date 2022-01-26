@@ -149,6 +149,12 @@ std::shared_ptr<AstNode> Parser::ParsePostFixExpr() {
       Lex.ExpectToken(TokenKind::RBracket);
       left = starNode;
       continue;
+    }
+    else if (Lex.CurrentToken->Kind == TokenKind::Period) {
+      Lex.SkipToken(TokenKind::Period);
+      auto node = MakeMemberAccessNode(left);
+      left = node;
+      continue;
     }else {
       break;
     }
@@ -454,6 +460,14 @@ std::shared_ptr<Type> Parser::ParseDeclarationSpec() {
     Lex.SkipToken(TokenKind::Long);
     return Type::LongType;
   }
+  if (Lex.CurrentToken->Kind == TokenKind::Struct) {
+    Lex.SkipToken(TokenKind::Struct);
+    return ParseStructDeclaration();
+  }
+  if (Lex.CurrentToken->Kind == TokenKind::Union) {
+    Lex.SkipToken(TokenKind::Union);
+    return ParseUnionDeclaration();
+  }
   DiagLoc(Lex.CurrentToken->Location, "type not support yet!");
   return nullptr;
 }
@@ -515,17 +529,103 @@ std::shared_ptr<Type> Parser::ParseTypeSuffix(std::shared_ptr<Type> baseType)
   }
 }
 
+std::shared_ptr<RecordType> Parser::ParseStructOrUnionDeclaration(bool isStruct) {
+
+  RecordType::TagKind kind = RecordType::TagKind::Struct;
+  if (!isStruct) {
+    kind = RecordType::TagKind::Union;
+  }
+
+  auto recordTy = std::make_shared<RecordType>(kind);
+  Lex.ExpectToken(TokenKind::LBrace);
+  while (Lex.CurrentToken->Kind != TokenKind::RBrace) {
+    auto baseTy = ParseDeclarationSpec();
+    std::shared_ptr<Token> tok;
+    auto ty = ParseDeclarator(baseTy, tok);
+    recordTy->Flds.push_back(std::make_shared<Filed>(ty, tok, 0));
+
+    while (Lex.CurrentToken->Kind == TokenKind::Comma) {
+      Lex.SkipToken(TokenKind::Comma);
+      ty = ParseDeclarator(baseTy, tok);
+      recordTy->Flds.push_back(std::make_shared<Filed>(ty, tok, 0));
+    }
+    Lex.ExpectToken(TokenKind::Semicolon);
+  }
+  Lex.SkipToken(TokenKind::RBrace);
+  return recordTy;
+}
+
+std::shared_ptr<Type> Parser::ParseStructDeclaration() {
+  auto ty = ParseStructOrUnionDeclaration(true);
+
+  int offset = 0;
+  for (auto &fd : ty->Flds) {
+    offset = AlignTo(offset, fd->Ty->Align);
+    fd->Offset = offset;
+    offset += fd->Ty->Size;
+
+    if (ty->Align < fd->Ty->Align)
+      ty->Align = fd->Ty->Align;
+  }
+  ty->Size = AlignTo(offset, ty->Align);
+
+  return ty;
+}
+
+std::shared_ptr<Type> Parser::ParseUnionDeclaration() {
+  auto ty = ParseStructOrUnionDeclaration(false);
+
+  for (auto &fd : ty->Flds) {
+    if (ty->Size < fd->Ty->Size)
+      ty->Size = fd->Ty->Size;
+    if (ty->Align < fd->Ty->Align)
+      ty->Align = fd->Ty->Align;
+  }
+  return ty;
+}
+
 bool Parser::IsTypeName() {
   return Lex.CurrentToken->Kind == TokenKind::Char
       || Lex.CurrentToken->Kind == TokenKind::Short
       || Lex.CurrentToken->Kind == TokenKind::Int
-      || Lex.CurrentToken->Kind == TokenKind::Long;
+      || Lex.CurrentToken->Kind == TokenKind::Long
+      || Lex.CurrentToken->Kind == TokenKind::Struct
+      || Lex.CurrentToken->Kind == TokenKind::Union;
 }
 
 std::shared_ptr<VarExprNode> Parser::MakeVarNode(std::shared_ptr<Var> var, std::shared_ptr<Token> tok) {
   auto node = std::make_shared<VarExprNode>(tok);
   node->VarObj = var;
   node->Ty = var->Ty;
+  return node;
+}
+
+std::shared_ptr<AstNode> Parser::MakeMemberAccessNode(std::shared_ptr<AstNode> left) {
+
+  /// 判断左边的类型是否是struct
+  left->Accept(TypeVisitor::Visitor());
+  if (!left->Ty->IsStructType() && !left->Ty->IsUnionType()) {
+    DiagLoc(left->Tok->Location, "not a struct or a union");
+  }
+
+  /// 查找是否存在此成员
+  auto structTy = std::dynamic_pointer_cast<RecordType>(left->Ty);
+  std::shared_ptr<Filed> fd = nullptr;
+  for (auto &elem : structTy->Flds) {
+    if (Lex.CurrentToken->Content == elem->Tok->Content) {
+      fd = elem;
+      break;
+    }
+  }
+  if (fd == nullptr) {
+    DiagLoc(left->Tok->Location, "no member named '%s' in '%s'",
+            std::string(Lex.CurrentToken->Content).data(), std::string(left->Tok->Content).data());
+  }
+  auto node = std::make_shared<MemberAccessNode>(Lex.CurrentToken);
+  node->Lhs = left;
+  node->Fld = fd;
+  Lex.ExpectToken(TokenKind::Identifier);
+
   return node;
 }
 

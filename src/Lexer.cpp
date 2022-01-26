@@ -95,6 +95,10 @@ void Lexer::GetNextToken() {
     kind = TokenKind::Comma;
     GetNextChar();
   }
+  else if (CurChar == '.') {
+    kind = TokenKind::Period;
+    GetNextChar();
+  }
   else if (CurChar == '=') {
     if (PeekChar(1) == '=') {
       GetNextChar();
@@ -167,6 +171,10 @@ void Lexer::GetNextToken() {
         kind = TokenKind::Long;
       }else if (content == "sizeof") {
         kind = TokenKind::SizeOf;
+      }else if (content == "struct") {
+        kind = TokenKind::Struct;
+      }else if (content == "union") {
+        kind = TokenKind::Union;
       }
     }else {
       DiagLoc(Location, "current '%c' is illegal", CurChar);

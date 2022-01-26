@@ -41,7 +41,23 @@ namespace C100
     return TC == TypeClass::ArrayType;
   }
 
-  void TypeVisitor::VisitorProgramNode(ProgramNode *node) {
+  bool Type::IsStructType() const{
+    if (TC == TypeClass::RecordType) {
+      auto ry = dynamic_cast<const RecordType *>(this);
+      return ry->Kind == RecordType::TagKind::Struct;
+    }
+    return false;
+  }
+
+  bool Type::IsUnionType() const{
+    if (TC == TypeClass::RecordType) {
+      auto ry = dynamic_cast<const RecordType *>(this);
+      return ry->Kind == RecordType::TagKind::Union;
+    }
+    return false;
+  }
+
+void TypeVisitor::VisitorProgramNode(ProgramNode *node) {
     for (auto &f : node->Funcs)
       f->Accept(this);
   }
@@ -173,6 +189,10 @@ namespace C100
   void TypeVisitor::VisitorVarExprNode(VarExprNode *node) {
     node->Ty = node->VarObj->Ty;
   }
+
+  void TypeVisitor::VisitorMemberAccessNode(MemberAccessNode *node) {
+    node->Ty = node->Fld->Ty;
+  };
 
   TypeVisitor *TypeVisitor::Visitor() {
     static TypeVisitor visitor;

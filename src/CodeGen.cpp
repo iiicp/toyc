@@ -211,6 +211,11 @@ void CodeGen::VisitorVarExprNode(VarExprNode *node) {
   Load(node->Ty);
 }
 
+void CodeGen::VisitorMemberAccessNode(MemberAccessNode *node) {
+  GenAddr(node);
+  Load(node->Ty);
+}
+
 void CodeGen::VisitorIfStmtNode(IfStmtNode *node) {
     /// 1. 判断条件
     int n = Sequence++;
@@ -283,10 +288,6 @@ void CodeGen::VisitorForStmtNode(ForStmtNode *node)
   printf(".L.end_%d:\n", n);
 }
 
-int CodeGen::AlignTo(int size, int align) {
-  return (size + align - 1) / align * align;
-}
-
 void CodeGen::VisitorStmtExprNode(StmtExprNode *node) {
   for (auto &s : node->Stmts)
     s->Accept(this);
@@ -354,7 +355,11 @@ void CodeGen::GenAddr(AstNode *node) {
     }else {
       DiagLoc(node->Tok->Location,"unaryNode must be dereference operation");
     }
-  }else {
+  }else if (auto memberAccessNode = dynamic_cast<MemberAccessNode *>(node)) {
+    GenAddr(memberAccessNode->Lhs.get());
+    printf("\tadd $%d, %%rax\n", memberAccessNode->Fld->Offset);
+  }
+  else {
     DiagLoc(node->Tok->Location, "not a lvalue");
   }
 }
@@ -364,7 +369,7 @@ void CodeGen::VisitorSizeofExprNode(SizeofExprNode *node) {
 }
 
 void CodeGen::Load(std::shared_ptr<Type> ty) {
-  if (ty->IsArrayType()) {
+  if (ty->IsArrayType() || ty->IsStructType() || ty->IsUnionType()) {
     return;
   }
   if (ty->Size == 1) {
@@ -373,10 +378,8 @@ void CodeGen::Load(std::shared_ptr<Type> ty) {
     printf("\tmovsw (%%rax), %%rax\n");
   }else if (ty->Size == 4) {
     printf("\tmovsl (%%rax), %%rax\n");
-  }else if (ty->Size == 8) {
-    printf("\tmov (%%rax), %%rax\n");
   }else {
-    assert(0);
+    printf("\tmov (%%rax), %%rax\n");
   }
 }
 
@@ -388,9 +391,10 @@ void CodeGen::Store(std::shared_ptr<Type> ty) {
     printf("\tmov %%ax, (%%rdi)\n");
   }else if (ty->Size == 4) {
     printf("\tmov %%eax, (%%rdi)\n");
-  }else if (ty->Size == 8) {
+  }else if (ty->Size == 8){
     printf("\tmov %%rax, (%%rdi)\n");
   }else {
+    printf("size = %d\n", ty->Size);
     assert(0);
   }
 }

@@ -20,6 +20,7 @@ namespace C100
 {
   class AstVisitor;
   class Type;
+  class Filed;
   class Token;
   class AstNode
   {
@@ -222,6 +223,15 @@ namespace C100
     void Accept(AstVisitor *visitor) override;
   };
 
+  class MemberAccessNode : public AstNode
+  {
+  public:
+    std::shared_ptr<AstNode> Lhs;
+    std::shared_ptr<Filed> Fld;
+    MemberAccessNode(std::shared_ptr<Token> tok) : AstNode(tok) {}
+    void Accept(AstVisitor *visitor) override;
+  };
+
   class AstVisitor
   {
   public:
@@ -244,7 +254,10 @@ namespace C100
     virtual void VisitorUnaryNode(UnaryNode *node) = 0;
     virtual void VisitorNumNode(NumNode *node) = 0;
     virtual void VisitorVarExprNode(VarExprNode *node) = 0;
+    virtual void VisitorMemberAccessNode(MemberAccessNode *node) = 0;
   };
+
+  int AlignTo(int size, int align);
 }
 
 #endif // C100_ASTNODE_H
