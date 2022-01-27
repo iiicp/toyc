@@ -30,7 +30,7 @@ namespace C100
     RParen, LBracket, RBracket, LBrace, RBrace,
     Semicolon, Assign, Comma, Amp, Equal,
     PipeEqual, Greater, GreaterEqual, Lesser,
-    LesserEqual, Period,
+    LesserEqual, Period, PointerTo,
 
     Num,
     Eof

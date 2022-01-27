@@ -14,6 +14,7 @@
 #include "AstNode.h"
 #include <unordered_map>
 #include "Type.h"
+#include "Scope.h"
 
 namespace C100
 {
@@ -22,7 +23,7 @@ namespace C100
   private:
     Lexer &Lex;
     std::list<std::shared_ptr<Var>> *Locals{nullptr};
-    std::unordered_map<std::string_view, std::shared_ptr<Var>> LocalsMap;
+    Scope Sp;
   public:
     Parser(Lexer &lex):Lex(lex) {}
     std::shared_ptr<ProgramNode> Parse();

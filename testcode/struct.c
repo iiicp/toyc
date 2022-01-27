@@ -23,5 +23,11 @@ int main() {
   assert(2, ({struct {char c[3]; int a[4]; long b; struct {char c; int a; long b;} s;} s;  s.s.c = 1; s.s.a = 2; s.s.b = 3; s.s.a;}));
   assert(3, ({struct {char c[3]; int a[4]; long b; struct {char c; int a; long b;} s;} s;  s.s.c = 1; s.s.a = 2; s.s.b = 3; s.s.b;}));
 
+
+  assert(5, ({struct A {char c;}; struct A s; s.c = 5; s.c;}));
+  assert(30, ({struct A {char c, d;}; struct A s; s.c = 5; s.d = 6; s.c * s.d;}));
+  assert(5, ({struct A {char c;} s; s.c = 5; s.c;}));
+  assert(5, ({struct A {char c;} s; struct A *p = &s;  p->c = 5; s.c;}));
+  assert(30, ({struct A {char c, d;} s; struct A *p = &s; p->c = 5; p->d = 6; s.c * s.d;}));
   return 0;
 }

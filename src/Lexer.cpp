@@ -48,7 +48,12 @@ void Lexer::GetNextToken() {
     GetNextChar();
   }
   else if (CurChar == '-') {
-    kind = TokenKind::Minus;
+    if (PeekChar(1) == '>') {
+      GetNextChar();
+      kind = TokenKind::PointerTo;
+    }else {
+      kind = TokenKind::Minus;
+    }
     GetNextChar();
   }
   else if (CurChar == '*') {
