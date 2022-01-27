@@ -26,22 +26,18 @@ day15: 支持数组声明和指针访问
 day16: 支持数组索引，添加编译脚本
 day17: 支持char/short/long类型
 day18: 支持struct/union声明和成员访问
+day19: 支持作用域和struct tag 以及 -> 访问
 
 int main() {
-    struct {
-        char c[3];
-        int a[4];
-        long b;
-        struct {
-            char c;
-            int a;
-            long b;
-        } s;
+
+    struct A {
+        char c, d;
     } s;
-    s.c[0] = 2;
-    s.s.c = 0;
-    s.s.a = 2;
-    s.s.b = 0;
-   return s.c[0] + s.s.c + s.s.a + s.s.b;
+
+    struct A *p = &s;
+    p->c = 5;
+    p->d = 6;
+
+    return s.c * s.d;
 }
 
