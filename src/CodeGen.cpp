@@ -373,11 +373,11 @@ void CodeGen::Load(std::shared_ptr<Type> ty) {
     return;
   }
   if (ty->Size == 1) {
-    printf("\tmovsb (%%rax), %%rax\n");
+    printf("\tmovsbq (%%rax), %%rax\n");
   }else if (ty->Size == 2) {
-    printf("\tmovsw (%%rax), %%rax\n");
+    printf("\tmovswq (%%rax), %%rax\n");
   }else if (ty->Size == 4) {
-    printf("\tmovsl (%%rax), %%rax\n");
+    printf("\tmovslq (%%rax), %%rax\n");
   }else {
     printf("\tmov (%%rax), %%rax\n");
   }
