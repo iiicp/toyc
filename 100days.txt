@@ -27,6 +27,7 @@ day16: 支持数组索引，添加编译脚本
 day17: 支持char/short/long类型
 day18: 支持struct/union声明和成员访问
 day19: 支持作用域和struct tag 以及 -> 访问
+day20: split parser&&sema
 
 int main() {
 
