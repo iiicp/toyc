@@ -23,9 +23,9 @@ PrimaryExpr          :=      Num
 -----------------------------------------
 Prog                 :=      Stmt*
 Stmt                 :=      Expr;
-Expr                 :=      AssignExpr
-AssignExpr           :=      AddExpr
-                     :=      AddExpr = AssignExpr
+Expr                 :=      Expr
+Expr           :=      AddExpr
+                     :=      AddExpr = Expr
 AddExpr              :=      MultiExpr
                      :=      AddExpr + MultiExpr
                      :=      AddExpr -  MultiExpr
@@ -34,7 +34,7 @@ MultiExpr            :=      PrimaryExpr
                      :=      MultiExpr / PrimaryExpr
 PrimaryExpr          :=      Num
                      :=      (Expr)
-                     :=      Identifier
+                     :=      Id
 
 -----------------------------------------
 Prog                 :=      Function*
@@ -65,9 +65,9 @@ BlockStmt            :=      "{" Stmt* "}"
 ReturnStmt           :=      return Expr ";"
 DeclarationStmt      :=      DeclarationSpec Declarator(= Expr)? (, Declarator(= Expr)?)* ";"
                      :=      DeclarationSpec ";"
-Expr                 :=      AssignExpr
-AssignExpr           :=      EqualityExpr
-                     :=      EqualityExpr = AssignExpr
+Expr                 :=      Expr
+Expr           :=      EqualityExpr
+                     :=      EqualityExpr = Expr
 EqualityExpr         :=      RelationalExpr
                      :=      EqualityExpr == RelationalExpr
                      :=      EqualityExpr != relationalExpr
@@ -91,7 +91,7 @@ PostfixExpr          :=      PrimaryExpr
                      :=      PrimaryExpr "->" identifier
 PrimaryExpr          :=      Num
                      :=      (Expr)
-                     :=      Identifier
+                     :=      Id
                      :=      "({"Stmt+"})"
                      :=      sizeof UnaryExpr
-ArgExprList          :=      AssignExpr(,AssignExpr)*
+ArgExprList          :=      Expr(,Expr)*
