@@ -224,44 +224,57 @@ void CodeGen::VisitorBlockStmtNode(BlockStmtNode *node)
 void CodeGen::VisitorWhileStmtNode(WhileStmtNode *node)
 {
   int n = Sequence++;
-  printf(".L.begin_%d:\n", n);
+  LabelStack.push(n);
+  printf(".LContinue_%d:\n", n);
   node->Cond->Accept(this);
   printf("\tcmp $0, %%rax\n");
-  printf("\tje .L.end_%d\n", n);
+  printf("\tje .LBreak_%d\n", n);
   node->Then->Accept(this);
-  printf("\tjmp .L.begin_%d\n", n);
-  printf(".L.end_%d:\n", n);
+  printf("\tjmp .LContinue_%d\n", n);
+  printf(".LBreak_%d:\n", n);
+  LabelStack.pop();
 }
 
 void CodeGen::VisitorDoWhileStmtNode(DoWhileStmtNode *node)
 {
   int n = Sequence++;
-  printf(".L.begin_%d:\n", n);
+  LabelStack.push(n);
+  printf(".LBegin_%d:\n", n);
   node->Stmt->Accept(this);
+  printf(".LContinue_%d:\n", n);
   node->Cond->Accept(this);
   printf("\tcmp $0, %%rax\n");
-  printf("\tje .L.end_%d\n", n);
-  printf("\tjmp .L.begin_%d\n", n);
-  printf(".L.end_%d:\n", n);
+  printf("\tje .LBreak_%d\n", n);
+  printf("\tjmp .LBegin_%d\n", n);
+  printf(".LBreak_%d:\n", n);
+  LabelStack.pop();
 }
 
 void CodeGen::VisitorForStmtNode(ForStmtNode *node)
 {
   int n = Sequence++;
-  if (node->Init)
-    node->Init->Accept(this);
-  printf(".L.begin_%d:\n", n);
+  LabelStack.push(n);
+
+  if (node->InitExpr)
+    node->InitExpr->Accept(this);
+  else if (node->InitDecl) {
+    node->InitDecl->Accept(this);
+  }
+  printf(".LBegin_%d:\n", n);
   if (node->Cond) {
     node->Cond->Accept(this);
     printf("\tcmp $0, %%rax\n");
-    printf("\tje .L.end_%d\n", n);
+    printf("\tje .LBreak_%d\n", n);
   }
   node->Stmt->Accept(this);
+  printf(".LContinue_%d:\n", n);
   if (node->Inc) {
     node->Inc->Accept(this);
   }
-  printf("\tjmp .L.begin_%d\n", n);
-  printf(".L.end_%d:\n", n);
+  printf("\tjmp .LBegin_%d\n", n);
+  printf(".LBreak_%d:\n", n);
+
+  LabelStack.pop();
 }
 
 void CodeGen::VisitorStmtExprNode(StmtExpr *node) {
@@ -293,6 +306,14 @@ void CodeGen::VisitorFuncCallExprNode(FuncCallExpr *node) {
 void CodeGen::VisitorReturnStmtNode(ReturnStmtNode *node) {
   node->Lhs->Accept(this);
   printf("\tjmp .LReturn_%s\n",CurrentFuncName.data());
+}
+
+void CodeGen::VisitorBreakStmtNode(BreakStmtNode *node) {
+  printf("\tjmp .LBreak_%d\n", LabelStack.top());
+}
+
+void CodeGen::VisitorContinueStmtNode(ContinueStmtNode *node) {
+  printf("\tjmp .LContinue_%d\n", LabelStack.top());
 }
 
 

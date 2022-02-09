@@ -28,5 +28,21 @@ int main()
   assert(18, ({int i = 0,j=0; int sum= 0;for (;i<10;i=i+1) {sum = i+j;j=j+1;} sum;}));
   assert(18, ({int i = 0,j=0; int sum= 0;for (;i<10;) {sum = i+j;j=j+1;i=i+1;} sum;}));
 
+  assert(18, ({int i = 0,j=0; int sum= 0;for (int i=0;i<10;i=i+1) {sum = i+j;j=j+1;} sum;}));
+
+  assert(10, ({int i = 5,j=0; int sum= 0;for (int i=0;i<10;i=i+1) {sum = i+1;} sum;}));
+
+  assert(0, ({int i = 5,j=0; int sum= 0; for (int i=0;i<10;i=i+1) {break; continue; sum = i+1;} sum;}));
+
+  assert(3, ({int i = 0; for (; i < 10; i=i+1){if (i == 3) break;} i;}));
+  assert(4, ({int i = 0; int j = 0; for (; i < 10; i=i+1){if (i > 3) continue; j=j+1;} j;}));
+  assert(50, ({int i = 0, j = 0; while (i < 100) {if(i > 50) break; j = i; i=i+1;} j;}));
+  assert(50, ({int i = 0, j = 0; do {if(i > 50) break; j = i; i=i+1;} while (i < 100); j;}));
+
+  assert(3, ({ int i=5; for(i = 0;i<10;i=i+1) { if (i == 3) break; } i; }));
+  assert(3, ({ int i=0; for(;i<10;i=i+1) { for (;;) break; if (i == 3) break; } i; }));
+
+  assert(10, ({ int i=0; int j=0; for (;i<10;i=i+1) { if (i>5) continue; j=j+1; } i; }));
+  assert(6, ({ int i=0; int j=0; for (;i<10;i=i+1) { if (i>5) continue; j=j+1; } j; }));
   return 0;
 }

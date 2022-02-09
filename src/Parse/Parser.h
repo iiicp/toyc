@@ -54,6 +54,8 @@ namespace CCC
     std::shared_ptr<BlockStmtNode>  ParseBlockStmt();
     std::shared_ptr<ReturnStmtNode> ParseReturnStmt();
     std::shared_ptr<ExprStmtNode>   ParseExprStmt();
+    std::shared_ptr<BreakStmtNode>   ParseBreakStmt();
+    std::shared_ptr<ContinueStmtNode> ParseContinueStmt();
 
     std::shared_ptr<ExprNode> ParseExpr();
     std::shared_ptr<ExprNode> ParseConstantExpression();

@@ -32,6 +32,8 @@ namespace CCC {
       {"do" , TokenKind::Do},
       {"for" , TokenKind::For},
       {"sizeof", TokenKind::SizeOf},
+      {"break", TokenKind::Break},
+      {"continue", TokenKind::Continue},
 
       {"+", TokenKind::Plus},
       {"-", TokenKind::Minus},
@@ -88,6 +90,8 @@ namespace CCC {
     {TokenKind::Do,       "do"},
     {TokenKind::For,      "for"},
     {TokenKind::SizeOf,   "sizeof"},
+    {TokenKind::Break,   "break"},
+    {TokenKind::Continue,   "continue"},
 
     {TokenKind::Plus,     "+"},
     {TokenKind::Minus,    "-"},

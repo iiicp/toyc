@@ -15,6 +15,7 @@
 #include <string>
 #include "Type.h"
 #include "SymbolTable.h"
+#include <stack>
 
 namespace CCC {
   class CodeGen : public AstVisitor
@@ -27,6 +28,7 @@ namespace CCC {
     const char *Reg32[6] = {"%edi", "%esi", "%edx", "%ecx", "%r8d", "%r9d"};
     const char *Reg64[6] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
     std::string CurrentFuncName;
+    std::stack<int> LabelStack;
   public:
     CodeGen() {}
 
@@ -43,6 +45,8 @@ namespace CCC {
     void VisitorForStmtNode(ForStmtNode *node) override;
     void VisitorBlockStmtNode(BlockStmtNode *node) override;
     void VisitorReturnStmtNode(ReturnStmtNode *node) override;
+    void VisitorBreakStmtNode(BreakStmtNode *node) override;
+    void VisitorContinueStmtNode(ContinueStmtNode *node) override;
 
     void VisitorAssignExprNode(AssignExpr *node) override;
     void VisitorSizeOfExprNode(SizeOfExpr *node) override;

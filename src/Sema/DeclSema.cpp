@@ -72,6 +72,7 @@ namespace CCC {
     node->BlockStmt->needEnterScope = false;
     node->BlockStmt->Accept(this);
 
+    SymTable.ExitScope();
     CurrentFunc = nullptr;
   }
 
@@ -374,9 +375,9 @@ namespace CCC {
       }else
       {
         if(initDec->Ty->TyCls == varSym->Ty->TyCls){
-          SemaDiag(initDec->Tok->Location,"redefinition of \'%s\' ",initDec->Id.data());
+          SemaDiag(initDec->Tok->Location,"redefinition of \'%s\' ",std::string(initDec->Id).data());
         }else{
-          SemaDiag(initDec->Tok->Location,"redefinition of \'%s\' as different kind of symbol", initDec->Id.data());
+          SemaDiag(initDec->Tok->Location,"redefinition of \'%s\' as different kind of symbol", std::string(initDec->Id).data());
         }
       }
     }
@@ -411,7 +412,7 @@ namespace CCC {
         if (initDec->Init)
         {
           if (sym->Defined){
-            SemaDiag(initDec->Tok->Location, "redefinition of %s", initDec->Id.data());
+            SemaDiag(initDec->Tok->Location, "redefinition of %s", std::string(initDec->Id).data());
           }
           else{
             sym->Init = initDec->Init->IData;

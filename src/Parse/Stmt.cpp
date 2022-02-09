@@ -15,23 +15,29 @@ namespace CCC
 {
   std::shared_ptr<StmtNode> Parser::ParseStmt()
   {
-    if (Lex.CurrentToken->Kind == TokenKind::If) {
+    if (Lex.Match(TokenKind::If)) {
       return ParseIfStmt();
     }
-    else if (Lex.CurrentToken->Kind == TokenKind::While) {
+    else if (Lex.Match(TokenKind::While)) {
       return ParseWhileStmt();
     }
-    else if (Lex.CurrentToken->Kind == TokenKind::Do) {
+    else if (Lex.Match(TokenKind::Do)) {
       return ParseDoWhileStmt();
     }
-    else if (Lex.CurrentToken->Kind == TokenKind::For) {
+    else if (Lex.Match(TokenKind::For)) {
       return ParseForStmt();
     }
-    else if (Lex.CurrentToken->Kind == TokenKind::LBrace) {
+    else if (Lex.Match(TokenKind::LBrace)) {
       return ParseBlockStmt();
     }
-    else if (Lex.CurrentToken->Kind == TokenKind::Return) {
+    else if (Lex.Match(TokenKind::Return)) {
       return ParseReturnStmt();
+    }
+    else if (Lex.Match(TokenKind::Break)) {
+      return ParseBreakStmt();
+    }
+    else if (Lex.Match(TokenKind::Continue)) {
+      return ParseContinueStmt();
     }
     else {
       return ParseExprStmt();
@@ -46,7 +52,7 @@ namespace CCC
     node->Cond = ParseExpr();
     Lex.ExpectToken(TokenKind::RParen);
     node->Then = ParseStmt();
-    if (Lex.CurrentToken->Kind == TokenKind::Else) {
+    if (Lex.Match(TokenKind::Else)) {
       Lex.SkipToken(TokenKind::Else);
       node->Else = ParseStmt();
     }
@@ -82,13 +88,20 @@ namespace CCC
     auto node = std::make_shared<ForStmtNode>(Lex.CurrentToken);
     Lex.SkipToken(TokenKind::For);
     Lex.ExpectToken(TokenKind::LParen);
-    if (Lex.CurrentToken->Kind != TokenKind::Semicolon)
-      node->Init = ParseExpr();
-    Lex.ExpectToken(TokenKind::Semicolon);
-    if (Lex.CurrentToken->Kind != TokenKind::Semicolon)
+    if (!Lex.Match(TokenKind::Semicolon)) {
+      if (FirstDeclarationSet.find(Lex.CurrentToken->Kind) != FirstDeclarationSet.end()) {
+        node->InitDecl = ParseDeclaration();
+      }else {
+        node->InitExpr = ParseExpr();
+        Lex.ExpectToken(TokenKind::Semicolon);
+      }
+    }else {
+      Lex.ExpectToken(TokenKind::Semicolon);
+    }
+    if (!Lex.Match(TokenKind::Semicolon))
       node->Cond = ParseExpr();
     Lex.ExpectToken(TokenKind::Semicolon);
-    if (Lex.CurrentToken->Kind != TokenKind::RParen)
+    if (!Lex.Match(TokenKind::RParen))
       node->Inc = ParseExpr();
     Lex.ExpectToken(TokenKind::RParen);
     node->Stmt = ParseStmt();
@@ -99,7 +112,7 @@ namespace CCC
   {
     auto node = std::make_shared<BlockStmtNode>(Lex.CurrentToken);
     Lex.SkipToken(TokenKind::LBrace);
-    while (Lex.CurrentToken->Kind != TokenKind::RBrace) {
+    while (!Lex.Match(TokenKind::RBrace)) {
       if (FirstDeclarationSet.find(Lex.CurrentToken->Kind) != FirstDeclarationSet.end()) {
         auto decl = ParseDeclaration();
         decl->IsLocalDecl = true;
@@ -125,9 +138,23 @@ namespace CCC
   std::shared_ptr<ExprStmtNode> Parser::ParseExprStmt()
   {
     auto node = std::make_shared<ExprStmtNode>(Lex.CurrentToken);
-    if (Lex.CurrentToken->Kind != TokenKind::Semicolon) {
+    if (!Lex.Match(TokenKind::Semicolon)) {
       node->Lhs = ParseExpr();
     }
+    Lex.ExpectToken(TokenKind::Semicolon);
+    return node;
+  }
+
+  std::shared_ptr<BreakStmtNode> Parser::ParseBreakStmt() {
+    auto node = std::make_shared<BreakStmtNode>(Lex.CurrentToken);
+    Lex.ExpectToken(TokenKind::Break);
+    Lex.ExpectToken(TokenKind::Semicolon);
+    return node;
+  }
+
+  std::shared_ptr<ContinueStmtNode> Parser::ParseContinueStmt() {
+    auto node = std::make_shared<ContinueStmtNode>(Lex.CurrentToken);
+    Lex.ExpectToken(TokenKind::Continue);
     Lex.ExpectToken(TokenKind::Semicolon);
     return node;
   }
@@ -158,5 +185,13 @@ namespace CCC
 
   void ExprStmtNode::Accept(AstVisitor *visitor) {
     visitor->VisitorExprStmtNode(this);
+  }
+
+  void BreakStmtNode::Accept(AstVisitor *visitor) {
+    visitor->VisitorBreakStmtNode(this);
+  }
+
+  void ContinueStmtNode::Accept(AstVisitor *visitor) {
+    visitor->VisitorContinueStmtNode(this);
   }
 }

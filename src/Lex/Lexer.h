@@ -28,7 +28,7 @@ namespace CCC
     Void, Bool, Char, Short, Int, Long,
     Float, Double, Signed, UnSigned,
     Const, Restrict, Volatile,
-    SizeOf, Struct, Union, Enum,
+    SizeOf, Struct, Union, Enum, Break, Continue,
 
     Plus, Minus, Star, Slash, LParen,
     RParen, LBracket, RBracket, LBrace, RBrace,

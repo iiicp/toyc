@@ -20,6 +20,7 @@
 #include "Stmt.h"
 #include "Type.h"
 #include "Basic/Diag.h"
+#include <stack>
 
 namespace CCC
 {
@@ -28,6 +29,8 @@ namespace CCC
   private:
     SymbolTable SymTable;
     Function *CurrentFunc;
+    std::stack<StmtNode *> LoopStmts;
+    std::stack<StmtNode *> Breakables;
   public:
     void VisitorTranslationUnitNode(TranslationUnit *node) override;
     void VisitorFunctionNode(Function *node) override;
@@ -55,6 +58,8 @@ namespace CCC
     void VisitorForStmtNode(ForStmtNode *node) override;
     void VisitorBlockStmtNode(BlockStmtNode *node) override;
     void VisitorReturnStmtNode(ReturnStmtNode *node) override;
+    void VisitorBreakStmtNode(BreakStmtNode *node) override;
+    void VisitorContinueStmtNode(ContinueStmtNode *node) override;
 
     void VisitorAssignExprNode(AssignExpr *node) override;
     void VisitorSizeOfExprNode(SizeOfExpr *node) override;
