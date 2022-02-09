@@ -42,7 +42,7 @@ namespace CCC
   }
   void Sema::VisitorBlockStmtNode(BlockStmtNode *node) {
 
-    if (!node->IsFuncFirstBlockStmt)
+    if (node->needEnterScope)
       SymTable.EnterScope();
 
     for (auto &decl : node->Decls) {

@@ -208,12 +208,8 @@ void Lexer::SkipToken(TokenKind kind)
   }
 }
 
-bool Lexer::CurIs(TokenKind kind) {
+bool Lexer::Match(TokenKind kind) {
   return CurrentToken->Kind == kind;
-}
-
-bool Lexer::CurNotIs(TokenKind kind) {
-  return CurrentToken->Kind != kind;
 }
 
 const char  *Lexer::GetTokenSimpleSpelling(TokenKind kind){

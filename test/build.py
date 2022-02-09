@@ -30,7 +30,8 @@ def testOne(filename):
     print('{0} ok!'.format(filename))
 
 def testAll():
-    file = ['arith.c', 'array.c', 'control.c', 'function.c', 'pointer.c', 'struct.c', 'union.c', 'scope.c']
+    file = ['arith.c', 'array.c', 'control.c', 'function.c',
+            'pointer.c', 'struct.c', 'union.c', 'scope.c', 'declaration.c']
 
     for f in file:
         testOne(f)

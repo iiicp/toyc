@@ -103,8 +103,7 @@ namespace CCC
     void GetNextChar();
     void ExpectToken(TokenKind kind);
     void SkipToken(TokenKind kind);
-    bool CurIs(TokenKind kind);
-    bool CurNotIs(TokenKind kind);
+    bool Match(TokenKind kind);
 
     void BeginPeekToken();
     void EndPeekToken();

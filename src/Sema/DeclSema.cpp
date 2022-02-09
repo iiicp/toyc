@@ -69,7 +69,7 @@ namespace CCC {
     }
 
 //    SymTable.ExitScope();
-    node->BlockStmt->IsFuncFirstBlockStmt = true;
+    node->BlockStmt->needEnterScope = false;
     node->BlockStmt->Accept(this);
 
     CurrentFunc = nullptr;

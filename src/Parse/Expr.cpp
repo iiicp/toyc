@@ -56,7 +56,7 @@ namespace CCC
   {
     auto left = ParseEqualExpr();
 
-    if (Lex.CurIs(TokenKind::Assign)) {
+    if (Lex.Match(TokenKind::Assign)) {
       auto node = std::make_shared<AssignExpr>(Lex.CurrentToken);
       Lex.SkipToken(TokenKind::Assign);
       node->Lhs = left;
@@ -74,10 +74,10 @@ namespace CCC
    */
   std::shared_ptr<ExprNode> Parser::ParseEqualExpr() {
     auto left = ParseRelationalExpr();
-    while (Lex.CurIs(TokenKind::Equal) ||
-        Lex.CurIs(TokenKind::PipeEqual) ) {
+    while (Lex.Match(TokenKind::Equal) ||
+        Lex.Match(TokenKind::PipeEqual) ) {
       BinaryOperator op = BinaryOperator::Equal;
-      if (Lex.CurIs(TokenKind::PipeEqual))
+      if (Lex.Match(TokenKind::PipeEqual))
         op = BinaryOperator::PipeEqual;
       auto node = std::make_shared<BinaryExpr>(op, Lex.CurrentToken);
       Lex.GetNextToken();
@@ -98,17 +98,17 @@ namespace CCC
    */
   std::shared_ptr<ExprNode> Parser::ParseRelationalExpr() {
     auto left = ParseAddExpr();
-    while (Lex.CurIs(TokenKind::Greater) ||
-        Lex.CurIs(TokenKind::GreaterEqual) ||
-        Lex.CurIs(TokenKind::Lesser) ||
-        Lex.CurIs(TokenKind::LesserEqual)) {
+    while (Lex.Match(TokenKind::Greater) ||
+        Lex.Match(TokenKind::GreaterEqual) ||
+        Lex.Match(TokenKind::Lesser) ||
+        Lex.Match(TokenKind::LesserEqual)) {
 
       BinaryOperator op = BinaryOperator::Greater;
-      if (Lex.CurIs(TokenKind::GreaterEqual))
+      if (Lex.Match(TokenKind::GreaterEqual))
         op = BinaryOperator::GreaterEqual;
-      else if (Lex.CurIs(TokenKind::Lesser))
+      else if (Lex.Match(TokenKind::Lesser))
         op = BinaryOperator::Lesser;
-      else if (Lex.CurIs(TokenKind::LesserEqual))
+      else if (Lex.Match(TokenKind::LesserEqual))
         op = BinaryOperator::LesserEqual;
 
       auto node = std::make_shared<BinaryExpr>(op, Lex.CurrentToken);
@@ -129,11 +129,11 @@ namespace CCC
   std::shared_ptr<ExprNode> Parser::ParseAddExpr()
   {
     std::shared_ptr<ExprNode> left = ParseMultiExpr();
-    while (Lex.CurIs(TokenKind::Plus)
-        || Lex.CurIs(TokenKind::Minus)) {
+    while (Lex.Match(TokenKind::Plus)
+        || Lex.Match(TokenKind::Minus)) {
 
       BinaryOperator bop = BinaryOperator::Add;
-      if (Lex.CurIs(TokenKind::Minus))
+      if (Lex.Match(TokenKind::Minus))
         bop = BinaryOperator::Sub;
 
       auto node = std::make_shared<BinaryExpr>(bop, Lex.CurrentToken);
@@ -155,10 +155,10 @@ namespace CCC
   std::shared_ptr<ExprNode> Parser::ParseMultiExpr()
   {
     std::shared_ptr<ExprNode> left = ParseUnaryExpr();
-    while (Lex.CurIs(TokenKind::Star)
-        || Lex.CurIs(TokenKind::Slash)) {
+    while (Lex.Match(TokenKind::Star)
+        || Lex.Match(TokenKind::Slash)) {
       BinaryOperator anOperator = BinaryOperator::Mul;
-      if (Lex.CurIs(TokenKind::Slash))
+      if (Lex.Match(TokenKind::Slash))
         anOperator = BinaryOperator::Div;
       auto node = std::make_shared<BinaryExpr>(anOperator, Lex.CurrentToken);
       Lex.GetNextToken();
@@ -271,9 +271,9 @@ namespace CCC
     Lex.SkipToken(TokenKind::LParen);
     auto node = std::make_shared<FuncCallExpr>(expr->Tok);
     node->FuncName = expr->Tok->Content;
-    if (Lex.CurNotIs(TokenKind::RParen)) {
+    if (!Lex.Match(TokenKind::RParen)) {
       node->Args.push_back(ParseAssignExpr());
-      while (Lex.CurIs(TokenKind::Comma)) {
+      while (Lex.Match(TokenKind::Comma)) {
         Lex.SkipToken(TokenKind::Comma);
         node->Args.push_back(ParseAssignExpr());
       }
@@ -287,7 +287,7 @@ namespace CCC
     auto node = std::make_shared<MemberExpr>(Lex.CurrentToken);
     Lex.GetNextToken();
     node->Lhs = expr;
-    if (Lex.CurNotIs(TokenKind::Id)) {
+    if (!Lex.Match(TokenKind::Id)) {
       ParseDiag(Lex.CurrentToken->Location, "expected a identifier as Struct or Union member");
     }
     node->RhsName = Lex.CurrentToken->Content;
@@ -304,10 +304,10 @@ namespace CCC
    */
   std::shared_ptr<ExprNode> Parser::ParsePrimaryExpr()
   {
-    if (Lex.CurIs(TokenKind::LParen)) {
+    if (Lex.Match(TokenKind::LParen)) {
       Lex.BeginPeekToken();
       Lex.GetNextToken();
-      if (Lex.CurIs(TokenKind::LBrace)) {
+      if (Lex.Match(TokenKind::LBrace)) {
         Lex.EndPeekToken();
         return ParseStmtExpr();
       }
@@ -317,9 +317,9 @@ namespace CCC
       auto node = ParseExpr();
       Lex.ExpectToken(TokenKind::RParen);
       return node;
-    }else if (Lex.CurIs(TokenKind::Num)) {
+    }else if (Lex.Match(TokenKind::Num)) {
       return ParseNumExpr();
-    }else if (Lex.CurIs(TokenKind::Id)) {
+    }else if (Lex.Match(TokenKind::Id)) {
       return ParseVarExpr();
     }else {
       ParseDiag(Lex.CurrentToken->Location, "error expr or not supported");
@@ -335,7 +335,7 @@ namespace CCC
     Lex.SkipToken(TokenKind::LBrace);
 
 
-    while (Lex.CurNotIs(TokenKind::RBrace)) {
+    while (!Lex.Match(TokenKind::RBrace)) {
       if (FirstDeclarationSet.find(Lex.CurrentToken->Kind) != FirstDeclarationSet.end()) {
         node->Decls.push_back(ParseDeclaration());
       }else {

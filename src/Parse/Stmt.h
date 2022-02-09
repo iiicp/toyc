@@ -80,7 +80,7 @@ namespace CCC
 
   public:
     /// sema
-    bool IsFuncFirstBlockStmt{false};
+    bool needEnterScope{true};
   };
 
   class ReturnStmtNode : public StmtNode

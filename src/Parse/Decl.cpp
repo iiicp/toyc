@@ -25,7 +25,7 @@ namespace CCC
   std::shared_ptr<TranslationUnit> Parser::ParseTranslationUnit()
   {
     auto node = std::make_shared<TranslationUnit>(Lex.CurrentToken);
-    while (Lex.CurNotIs(TokenKind::Eof)) {
+    while (!Lex.Match(TokenKind::Eof)) {
       node->ExtDecl.push_back(ParseExternalDeclaration());
     }
     return node;
@@ -54,7 +54,7 @@ namespace CCC
 
         /// function declaration
         /// void (*a())(int);
-        if (Lex.CurIs(TokenKind::Semicolon)) {
+        if (Lex.Match(TokenKind::Semicolon)) {
           decl->IsLocalDecl = false;
           Lex.SkipToken(TokenKind::Semicolon);
           return decl;
@@ -88,7 +88,7 @@ namespace CCC
   std::shared_ptr<Declaration> Parser::ParseCommonHeader() {
     auto node = std::make_shared<Declaration>(Lex.CurrentToken);
     node->Spec = ParseDeclSpecifier();
-    if (Lex.CurNotIs(TokenKind::Semicolon)) {
+    if (!Lex.Match(TokenKind::Semicolon)) {
       node->DecList.push_back(ParseInitDeclarator());
       while (Lex.CurrentToken->Kind == TokenKind::Comma) {
         Lex.SkipToken(TokenKind::Comma);
@@ -193,7 +193,7 @@ namespace CCC
     auto node = std::make_shared<InitDeclarator>(Lex.CurrentToken);
     node->Dec = ParseDeclarator();
     node->Id = node->Dec->Id;
-    if (Lex.CurIs(TokenKind::Assign)) {
+    if (Lex.Match(TokenKind::Assign)) {
       Lex.SkipToken(TokenKind::Assign);
       node->Init = ParseInitializer();
     }
@@ -259,12 +259,12 @@ namespace CCC
   {
     std::shared_ptr<Declarator> dec;
 
-    if (Lex.CurIs(TokenKind::LParen)) {
+    if (Lex.Match(TokenKind::LParen)) {
       Lex.SkipToken(TokenKind::LParen);
       dec = ParseDeclarator();
       Lex.ExpectToken(TokenKind::RParen);
     }else {
-      if (Lex.CurNotIs(TokenKind::Id)) {
+      if (!Lex.Match(TokenKind::Id)) {
         ParseDiag(Lex.CurrentToken->Location, "expected a identifier");
       }
       dec = std::make_shared<NameDeclarator>(Lex.CurrentToken);
@@ -274,7 +274,7 @@ namespace CCC
 
     while (true)
     {
-      if (Lex.CurIs(TokenKind::LBracket))
+      if (Lex.Match(TokenKind::LBracket))
       {
         auto arrayDec = std::make_shared<ArrayDeclarator>(Lex.CurrentToken);
         arrayDec->Dec = dec;
@@ -289,7 +289,7 @@ namespace CCC
         Lex.ExpectToken(TokenKind::RBracket);
         dec = arrayDec;
       }
-      else if (Lex.CurIs(TokenKind::LParen))
+      else if (Lex.Match(TokenKind::LParen))
       {
         auto funcDec = std::make_shared<FunctionDeclarator>(Lex.CurrentToken);
         funcDec->Dec = dec;
@@ -318,10 +318,10 @@ namespace CCC
   std::shared_ptr<ParamTypeList> Parser::ParseParamTypeList()
   {
     auto node = std::make_shared<ParamTypeList>(Lex.CurrentToken);
-    if (Lex.CurNotIs(TokenKind::RParen)) {
+    if (!Lex.Match(TokenKind::RParen)) {
       node->ParamDecl.push_back(ParseParamDeclaration());
     }
-    while (Lex.CurNotIs(TokenKind::RParen)) {
+    while (!Lex.Match(TokenKind::RParen)) {
       Lex.ExpectToken(TokenKind::Comma);
       if (Lex.CurrentToken->Kind == TokenKind::Ellipsis) {
         node->HaveEllipsis = true;
@@ -368,15 +368,15 @@ namespace CCC
   std::shared_ptr<Initializer> Parser::ParseInitializer() {
     auto node = std::make_shared<Initializer>(Lex.CurrentToken);
     /// 开头视野
-    if (Lex.CurIs(TokenKind::LBrace)) {
+    if (Lex.Match(TokenKind::LBrace)) {
       node->LBrace = true;
       Lex.SkipToken(TokenKind::LBrace);
       node->Initials = ParseInitializer();
       auto tail = node->Initials;
       /// 内部视野
-      while (Lex.CurIs(TokenKind::Comma)) {
+      while (Lex.Match(TokenKind::Comma)) {
         Lex.SkipToken(TokenKind::Comma);
-        if (Lex.CurIs(TokenKind::RBrace)) {
+        if (Lex.Match(TokenKind::RBrace)) {
           break;
         }
         tail->Next = ParseInitializer();
@@ -406,25 +406,25 @@ namespace CCC
   std::shared_ptr<StructSpecifier> Parser::ParseStructOrUnionSpecifier()
   {
     DeclClass cls = DeclClass::StructSpecifier;
-    if (Lex.CurIs(TokenKind::Union)) {
+    if (Lex.Match(TokenKind::Union)) {
       cls = DeclClass::UnionSpecifier;
     }
     auto node = std::make_shared<StructSpecifier>(Lex.CurrentToken);
     node->Cls = cls;
     Lex.GetNextToken();
 
-    if (Lex.CurIs(TokenKind::Id)) {
+    if (Lex.Match(TokenKind::Id)) {
       node->Id = Lex.CurrentToken->Content;
       Lex.SkipToken(TokenKind::Id);
     }
 
-    if (Lex.CurNotIs(TokenKind::LBrace)) {
+    if (!Lex.Match(TokenKind::LBrace)) {
       return node;
     }
 
     node->HasLBrace = true;
     Lex.ExpectToken(TokenKind::LBrace);
-    while (Lex.CurNotIs(TokenKind::RBrace)) {
+    while (!Lex.Match(TokenKind::RBrace)) {
       node->DeclList.push_back(ParseStructDeclaration());
     }
     Lex.ExpectToken(TokenKind::RBrace);
@@ -448,7 +448,7 @@ namespace CCC
     auto node = std::make_shared<StructDeclaration>(Lex.CurrentToken);
     node->Spec = ParseDeclSpecifier();
     node->DecList.push_back(ParseStructDeclarator());
-    while (Lex.CurIs(TokenKind::Comma)) {
+    while (Lex.Match(TokenKind::Comma)) {
       Lex.SkipToken(TokenKind::Comma);
       node->DecList.push_back(ParseStructDeclarator());
     }
@@ -482,18 +482,18 @@ namespace CCC
     auto node = std::make_shared<EnumSpecifier>(Lex.CurrentToken);
     Lex.SkipToken(TokenKind::Enum);
 
-    if (Lex.CurIs(TokenKind::Id)) {
+    if (Lex.Match(TokenKind::Id)) {
       Lex.SkipToken(TokenKind::Id);
       node->Id = Lex.CurrentToken->Content;
     }
-    if (Lex.CurNotIs(TokenKind::LBrace)) {
+    if (!Lex.Match(TokenKind::LBrace)) {
       return node;
     }
     Lex.ExpectToken(TokenKind::LBrace);
     node->DecList.push_back(ParseEnumDeclarator());
-    while (Lex.CurIs(TokenKind::Comma)) {
+    while (Lex.Match(TokenKind::Comma)) {
       Lex.SkipToken(TokenKind::Comma);
-      if (Lex.CurIs(TokenKind::RBrace)) {
+      if (Lex.Match(TokenKind::RBrace)) {
         break;
       }
       node->DecList.push_back(ParseEnumDeclarator());
@@ -504,7 +504,7 @@ namespace CCC
 
   std::shared_ptr<EnumDeclarator> Parser::ParseEnumDeclarator() {
     auto node = std::make_shared<EnumDeclarator>(Lex.CurrentToken);
-    if (Lex.CurNotIs(TokenKind::Id)) {
+    if (!Lex.Match(TokenKind::Id)) {
       ParseDiag(Lex.CurrentToken->Location, "expected a identifier");
     }
     node->Id = Lex.CurrentToken->Content;
