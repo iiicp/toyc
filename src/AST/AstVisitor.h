@@ -47,6 +47,11 @@ namespace CCC
   class ReturnStmtNode;
   class BreakStmtNode;
   class ContinueStmtNode;
+  class GotoStmtNode;
+  class LabelStmtNode;
+  class CaseStmtNode;
+  class DefaultStmtNode;
+  class SwitchStmtNode;
 
   /// expr
   class ExprNode;
@@ -91,6 +96,11 @@ namespace CCC
     virtual void VisitorReturnStmtNode(ReturnStmtNode *node) = 0;
     virtual void VisitorBreakStmtNode(BreakStmtNode *node) = 0;
     virtual void VisitorContinueStmtNode(ContinueStmtNode *node) = 0;
+    virtual void VisitorGotoStmtNode(GotoStmtNode *node) = 0;
+    virtual void VisitorLabelStmtNode(LabelStmtNode *node) = 0;
+    virtual void VisitorCaseStmtNode(CaseStmtNode *node) = 0;
+    virtual void VisitorDefaultStmtNode(DefaultStmtNode *node) = 0;
+    virtual void VisitorSwitchStmtNode(SwitchStmtNode *node) = 0;
 
     virtual void VisitorAssignExprNode(AssignExpr *node) = 0;
     virtual void VisitorSizeOfExprNode(SizeOfExpr *node) = 0;

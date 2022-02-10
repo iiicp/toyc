@@ -316,6 +316,52 @@ void CodeGen::VisitorContinueStmtNode(ContinueStmtNode *node) {
   printf("\tjmp .LContinue_%d\n", LabelStack.top());
 }
 
+void CodeGen::VisitorGotoStmtNode(GotoStmtNode *node) {
+  printf("\tjmp .LLabel_%s_%s\n", CurrentFuncName.data(), std::string(node->LabelName).data());
+}
+
+void CodeGen::VisitorLabelStmtNode(LabelStmtNode *node) {
+  printf(".LLabel_%s_%s:\n",CurrentFuncName.data(), std::string(node->LabelName).data());
+  node->Stmt->Accept(this);
+}
+
+void CodeGen::VisitorCaseStmtNode(CaseStmtNode *node) {
+  printf("\t.LCaseLabel_%d:\n", node->Label);
+  node->Stmt->Accept(this);
+}
+
+void CodeGen::VisitorDefaultStmtNode(DefaultStmtNode *node) {
+  printf("\t.LDefaultLabel_%d:\n", node->Label);
+  node->Stmt->Accept(this);
+}
+
+void CodeGen::VisitorSwitchStmtNode(SwitchStmtNode *node) {
+  int seq = Sequence++;
+  LabelStack.push(seq);
+
+  node->Expr->Accept(this);
+  printf("\tmov %%rax, %%rdi\n");
+
+  for (auto &caseStmt : node->CaseStmtList) {
+    caseStmt->Label = Sequence++;
+    caseStmt->Expr->Accept(this);
+    printf("\tcmp %%rax, %%rdi\n");
+    printf("\tje .LCaseLabel_%d\n", caseStmt->Label);
+  }
+
+  if (node->DefaultStmt) {
+    node->DefaultStmt->Label = Sequence++;
+    printf("\tjmp .LDefaultLabel_%d\n", node->DefaultStmt->Label);
+  }
+
+  printf("\tjmp .LBreak_%d\n", seq);
+
+  node->Stmt->Accept(this);
+
+  printf("\t.LBreak_%d:\n", seq);
+  LabelStack.pop();
+}
+
 
 void CodeGen::VisitorUnaryExprNode(UnaryExpr *node) {
   switch (node->Uop) {

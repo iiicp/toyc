@@ -24,7 +24,12 @@ namespace CCC
     BlockStmtNode,
     ReturnStmtNode,
     BreakStmtNode,
-    ContinueStmtNode
+    ContinueStmtNode,
+    GotoStmtNode,
+    LabelStmtNode,
+    CaseStmtNode,
+    DefaultStmtNode,
+    SwitchStmtNode
   };
 
   class StmtNode : public AstNode
@@ -134,6 +139,70 @@ namespace CCC
       Cls = StmtNodeClass::ContinueStmtNode;
     }
     void Accept(AstVisitor *visitor) override;
+  };
+
+  class GotoStmtNode : public StmtNode
+  {
+  public:
+    std::string_view LabelName;
+    GotoStmtNode(std::shared_ptr<Token> tok) : StmtNode(tok) {
+        Cls = StmtNodeClass::GotoStmtNode;
+    }
+    void Accept(AstVisitor *visitor) override;
+  };
+
+  class LabelStmtNode : public StmtNode
+  {
+  public:
+    std::string_view LabelName;
+    std::shared_ptr<StmtNode> Stmt;
+    LabelStmtNode(std::shared_ptr<Token> tok) : StmtNode(tok) {
+        Cls = StmtNodeClass::LabelStmtNode;
+    }
+    void Accept(AstVisitor *visitor) override;
+  };
+
+  class CaseStmtNode : public StmtNode
+  {
+  public:
+    std::shared_ptr<ExprNode> Expr;
+    std::shared_ptr<StmtNode> Stmt;
+    CaseStmtNode(std::shared_ptr<Token> tok) : StmtNode(tok) {
+      Cls = StmtNodeClass::CaseStmtNode;
+    }
+    void Accept(AstVisitor *visitor) override;
+  public:
+    /// codegen
+    int Label{0};
+  };
+
+  class DefaultStmtNode : public StmtNode
+  {
+  public:
+    std::shared_ptr<StmtNode> Stmt;
+    DefaultStmtNode(std::shared_ptr<Token> tok) : StmtNode(tok) {
+      Cls = StmtNodeClass::DefaultStmtNode;
+    }
+    void Accept(AstVisitor *visitor) override;
+  public:
+    /// codegen
+    int Label{0};
+  };
+
+  class SwitchStmtNode : public StmtNode
+  {
+  public:
+    std::shared_ptr<ExprNode> Expr;
+    std::shared_ptr<StmtNode> Stmt;
+    SwitchStmtNode(std::shared_ptr<Token> tok) : StmtNode(tok) {
+      Cls = StmtNodeClass::SwitchStmtNode;
+    }
+    void Accept(AstVisitor *visitor) override;
+
+  public:
+    /// sema
+    std::list<CaseStmtNode *> CaseStmtList;
+    DefaultStmtNode *DefaultStmt{nullptr};
   };
 }
 

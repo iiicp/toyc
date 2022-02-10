@@ -34,6 +34,10 @@ namespace CCC {
       {"sizeof", TokenKind::SizeOf},
       {"break", TokenKind::Break},
       {"continue", TokenKind::Continue},
+      {"goto" ,   TokenKind::Goto     },
+      {"switch" , TokenKind::Switch   },
+      {"case" ,   TokenKind::Case     },
+      {"default" , TokenKind::Default },
 
       {"+", TokenKind::Plus},
       {"-", TokenKind::Minus},
@@ -57,7 +61,8 @@ namespace CCC {
       {"<=",TokenKind::LesserEqual},
       {".",TokenKind::Period},
       {"->",TokenKind::Arrow},
-      {"...",TokenKind::Ellipsis}
+      {"...",TokenKind::Ellipsis},
+      {":",TokenKind::Colon}
   };
 
 
@@ -92,6 +97,10 @@ namespace CCC {
     {TokenKind::SizeOf,   "sizeof"},
     {TokenKind::Break,   "break"},
     {TokenKind::Continue,   "continue"},
+    {TokenKind::Goto     ,"goto"  },
+    {TokenKind::Switch   ,"switch" },
+    {TokenKind::Case     ,"case" },
+    { TokenKind::Default ,"default"},
 
     {TokenKind::Plus,     "+"},
     {TokenKind::Minus,    "-"},
@@ -115,6 +124,7 @@ namespace CCC {
     {TokenKind::LesserEqual, "<="},
     {TokenKind::Period, "."},
     {TokenKind::Arrow, "->"},
-    {TokenKind::Ellipsis, "..."}
+    {TokenKind::Ellipsis, "..."} ,
+    {TokenKind::Colon, ":"}
 };
 }

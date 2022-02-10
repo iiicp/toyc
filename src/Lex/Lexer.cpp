@@ -97,6 +97,10 @@ void Lexer::GetNextToken() {
     kind = TokenKind::Semicolon;
     GetNextChar();
   }
+  else if (CurChar == ':') {
+    kind = TokenKind::Colon;
+    GetNextChar();
+  }
   else if (CurChar == ',') {
     kind = TokenKind::Comma;
     GetNextChar();

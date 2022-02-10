@@ -29,12 +29,13 @@ namespace CCC
     Float, Double, Signed, UnSigned,
     Const, Restrict, Volatile,
     SizeOf, Struct, Union, Enum, Break, Continue,
+    Goto, Switch, Case, Default,
 
     Plus, Minus, Star, Slash, LParen,
     RParen, LBracket, RBracket, LBrace, RBrace,
     Semicolon, Assign, Comma, Amp, Equal,
     PipeEqual, Greater, GreaterEqual, Lesser,
-    LesserEqual, Period, Arrow, Ellipsis, LongLong,
+    LesserEqual, Period, Arrow, Ellipsis, LongLong, Colon,
 
     Num,
     Eof

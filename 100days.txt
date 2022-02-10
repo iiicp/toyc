@@ -29,6 +29,7 @@ day18: 支持struct/union声明和成员访问
 day19: 支持作用域和struct tag 以及 -> 访问
 day20: split parser&&sema
 day21: for支持声明&&添加break和continue语句
+day22: 支持goto和switch语句
 
 int main() {
 

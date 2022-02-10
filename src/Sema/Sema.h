@@ -29,8 +29,6 @@ namespace CCC
   private:
     SymbolTable SymTable;
     Function *CurrentFunc;
-    std::stack<StmtNode *> LoopStmts;
-    std::stack<StmtNode *> Breakables;
   public:
     void VisitorTranslationUnitNode(TranslationUnit *node) override;
     void VisitorFunctionNode(Function *node) override;
@@ -60,6 +58,11 @@ namespace CCC
     void VisitorReturnStmtNode(ReturnStmtNode *node) override;
     void VisitorBreakStmtNode(BreakStmtNode *node) override;
     void VisitorContinueStmtNode(ContinueStmtNode *node) override;
+    void VisitorGotoStmtNode(GotoStmtNode *node) override;
+    void VisitorLabelStmtNode(LabelStmtNode *node) override;
+    void VisitorCaseStmtNode(CaseStmtNode *node) override;
+    void VisitorDefaultStmtNode(DefaultStmtNode *node) override;
+    void VisitorSwitchStmtNode(SwitchStmtNode *node) override;
 
     void VisitorAssignExprNode(AssignExpr *node) override;
     void VisitorSizeOfExprNode(SizeOfExpr *node) override;

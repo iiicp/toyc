@@ -47,6 +47,11 @@ namespace CCC {
     void VisitorReturnStmtNode(ReturnStmtNode *node) override;
     void VisitorBreakStmtNode(BreakStmtNode *node) override;
     void VisitorContinueStmtNode(ContinueStmtNode *node) override;
+    void VisitorGotoStmtNode(GotoStmtNode *node) override;
+    void VisitorLabelStmtNode(LabelStmtNode *node) override;
+    void VisitorCaseStmtNode(CaseStmtNode *node) override;
+    void VisitorDefaultStmtNode(DefaultStmtNode *node) override;
+    void VisitorSwitchStmtNode(SwitchStmtNode *node) override;
 
     void VisitorAssignExprNode(AssignExpr *node) override;
     void VisitorSizeOfExprNode(SizeOfExpr *node) override;

@@ -39,6 +39,21 @@ namespace CCC
     else if (Lex.Match(TokenKind::Continue)) {
       return ParseContinueStmt();
     }
+    else if (Lex.Match(TokenKind::Goto)) {
+      return ParseGotoStmt();
+    }
+    else if (Lex.Match(TokenKind::Case)) {
+      return ParseCaseStmt();
+    }
+    else if (Lex.Match(TokenKind::Default)) {
+      return ParseDefaultStmt();
+    }
+    else if (Lex.Match(TokenKind::Switch)) {
+      return ParseSwitchStmt();
+    }
+    else if (Lex.Match(TokenKind::Id)) {
+      return ParseLabelStmt();
+    }
     else {
       return ParseExprStmt();
     }
@@ -159,6 +174,61 @@ namespace CCC
     return node;
   }
 
+  std::shared_ptr<GotoStmtNode> Parser::ParseGotoStmt() {
+    auto node = std::make_shared<GotoStmtNode>(Lex.CurrentToken);
+    Lex.SkipToken(TokenKind::Goto);
+    if (!Lex.Match(TokenKind::Id)) {
+      ParseDiag(node->Tok->Location, "expected a identifier");
+    }
+    node->LabelName = Lex.CurrentToken->Content;
+    Lex.SkipToken(TokenKind::Id);
+    Lex.ExpectToken(TokenKind::Semicolon);
+    return node;
+  }
+
+  std::shared_ptr<StmtNode>  Parser::ParseLabelStmt() {
+    Lex.BeginPeekToken();
+    Lex.GetNextToken();
+    if (Lex.Match(TokenKind::Colon)) {
+      Lex.EndPeekToken();
+      auto node = std::make_shared<LabelStmtNode>(Lex.CurrentToken);
+      node->LabelName = Lex.CurrentToken->Content;
+      Lex.SkipToken(TokenKind::Id);
+      Lex.SkipToken(TokenKind::Colon);
+      node->Stmt = ParseStmt();
+      return node;
+    }
+    Lex.EndPeekToken();
+    return ParseExprStmt();
+  }
+
+  std::shared_ptr<CaseStmtNode> Parser::ParseCaseStmt() {
+    auto node = std::make_shared<CaseStmtNode>(Lex.CurrentToken);
+    Lex.SkipToken(TokenKind::Case);
+    node->Expr = ParseExpr();
+    Lex.ExpectToken(TokenKind::Colon);
+    node->Stmt = ParseStmt();
+    return node;
+  }
+
+  std::shared_ptr<DefaultStmtNode>  Parser::ParseDefaultStmt() {
+    auto node = std::make_shared<DefaultStmtNode>(Lex.CurrentToken);
+    Lex.SkipToken(TokenKind::Default);
+    Lex.ExpectToken(TokenKind::Colon);
+    node->Stmt = ParseStmt();
+    return node;
+  }
+
+  std::shared_ptr<SwitchStmtNode>   Parser::ParseSwitchStmt() {
+    auto node = std::make_shared<SwitchStmtNode>(Lex.CurrentToken);
+    Lex.SkipToken(TokenKind::Switch);
+    Lex.ExpectToken(TokenKind::LParen);
+    node->Expr = ParseExpr();
+    Lex.ExpectToken(TokenKind::RParen);
+    node->Stmt = ParseStmt();
+    return node;
+  }
+
   void IfStmtNode::Accept(AstVisitor *visitor) {
     visitor->VisitorIfStmtNode(this);
   }
@@ -193,5 +263,25 @@ namespace CCC
 
   void ContinueStmtNode::Accept(AstVisitor *visitor) {
     visitor->VisitorContinueStmtNode(this);
+  }
+
+  void GotoStmtNode::Accept(AstVisitor *visitor) {
+    visitor->VisitorGotoStmtNode(this);
+  }
+
+  void LabelStmtNode::Accept(AstVisitor *visitor) {
+    visitor->VisitorLabelStmtNode(this);
+  }
+
+  void CaseStmtNode::Accept(AstVisitor *visitor) {
+    visitor->VisitorCaseStmtNode(this);
+  }
+
+  void DefaultStmtNode::Accept(AstVisitor *visitor) {
+    visitor->VisitorDefaultStmtNode(this);
+  }
+
+  void SwitchStmtNode::Accept(AstVisitor *visitor) {
+    visitor->VisitorSwitchStmtNode(this);
   }
 }

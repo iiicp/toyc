@@ -13,6 +13,8 @@
 
 #include "AstVisitor.h"
 #include "Symbol.h"
+#include <stack>
+#include <unordered_map>
 
 namespace CCC {
 
@@ -271,6 +273,13 @@ namespace CCC {
     std::shared_ptr<FunctionType> FunTy;
   };
 
+  struct Label
+  {
+    bool Defined{false};
+    std::string_view Id;
+    Label(std::string_view id) : Id(id) {}
+  };
+
   class Symbol;
   class Function : public DeclBase
   {
@@ -289,6 +298,10 @@ namespace CCC {
   public:
     /// sema
     std::shared_ptr<Symbol> FSym;
+    std::stack<StmtNode *> LoopStmts;
+    std::stack<StmtNode *> Breakables;
+    std::stack<SwitchStmtNode *> SwitchStmts;
+    std::unordered_map<std::string_view, std::shared_ptr<Label>> LabelsMap;
   };
 
   class TranslationUnit : public DeclBase
