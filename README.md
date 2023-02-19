@@ -1,5 +1,8 @@
 # C编译器功能TODO
 
+Note: ccc is no longer an active project. The successor is
+[lcc](https://github.com/iiicp/lcc).
+
 # 声明
 
 - [ ]  存储类声明说明符(`extern`、`static`、`auto`、`register`、`typedef`)
