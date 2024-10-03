@@ -1,7 +1,7 @@
 # C编译器功能TODO
 
 Note: ccc is no longer an active project. The successor is
-[lcc](https://github.com/iiicp/lcc).
+[subc-llvm](https://github.com/iiicp/subc-llvm).
 
 # 声明
 
